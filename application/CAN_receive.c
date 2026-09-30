@@ -39,7 +39,7 @@ extern CAN_HandleTypeDef hcan1;
 extern CAN_HandleTypeDef hcan2;
 
 	
-#ifdef chassis_board
+/* 本工程固件为底盘板（chassis_board）：CAN1 收发 3508，CAN2 收发 6020。 */
 static CAN_TxHeaderTypeDef  chassis_tx_message;
 //static MOTOR_MEASURE_t motor_chas[8];	//底盘上有8个电机
 MOTOR_MEASURE_t motor_chas[8];	//底盘上有8个电机
@@ -154,7 +154,6 @@ MOTOR_MEASURE_t *get_chassis_motor_measure_point(uint8_t i)
 {
 	return &motor_chas[i & 0x07];
 }
-#endif // DEBUG
 
 
 //#ifdef gimbal_board

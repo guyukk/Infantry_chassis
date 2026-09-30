@@ -23,11 +23,11 @@
 
 #define RC_FRAME_LENGTH 18u
 
-//不同板子定义
-//用在云台上的开发板gimbal_board
-//用在底盘上的开发板chassis_board
-#define chassis_board 1
-
+/*
+ * 本工程固件配置：底盘板（chassis_board）。
+ * 原开发板选择宏 chassis_board 已按当前唯一配置固定启用并删除，
+ * 源码中原 #ifdef chassis_board 条件分支已展开为始终编译的底盘板代码。
+ */
 #define RC_CH_VALUE_MIN         ((uint16_t)364)
 #define RC_CH_VALUE_OFFSET      ((uint16_t)1024)
 #define RC_CH_VALUE_MAX         ((uint16_t)1684)

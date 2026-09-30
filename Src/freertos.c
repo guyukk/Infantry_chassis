@@ -161,13 +161,12 @@ void MX_FREERTOS_Init(void) {
 	osThreadDef(OLED, oled_task, osPriorityLow, 0, 256);
 	oled_handle = osThreadCreate(osThread(OLED), NULL);
 
-#ifdef chassis_board
+	/* 本工程固件为底盘板（chassis_board）：创建底盘与裁判系统任务。 */
 	osThreadDef(ChassisTask, chassis_task, osPriorityHigh , 0, 1024);
 	chassisTaskHandle = osThreadCreate(osThread(ChassisTask), NULL);
 	
 	osThreadDef(REFEREE, referee_usart_task, osPriorityNormal, 0, 128);
 	referee_usart_task_handle = osThreadCreate(osThread(REFEREE), NULL);
-#endif // DEBUG
 
 	osThreadDef(SERVO, servo_task, osPriorityNormal, 0, 128);
 	servo_task_handle = osThreadCreate(osThread(SERVO), NULL);

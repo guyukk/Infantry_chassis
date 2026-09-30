@@ -31,11 +31,9 @@ void message_task(void const *pvParameters)
     vTaskDelay(MESSAGE_TASK_INIT_TIME * 5);
 
     while(1) {
-      #ifdef chassis_board
+        /* 本工程固件为底盘板（chassis_board）：向云台板发送底盘状态。 */
         send_to_gimbal();
 				vTaskDelay(MESSAGE_TASK_INIT_TIME * 2);
-      #endif // DEBUG
-      
     }
 }
 

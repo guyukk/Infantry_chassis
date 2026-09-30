@@ -38,8 +38,7 @@ typedef struct
 } MOTOR_MEASURE_t;
 
 
-#ifdef chassis_board
-
+/* 本工程固件为底盘板（chassis_board）：CAN1 收发 3508，CAN2 收发 6020。 */
 #define CHASSIS_3508_CAN hcan1  //2p
 #define CHASSIS_6020_CAN hcan2  //4p
 
@@ -67,7 +66,6 @@ typedef enum
 extern void CAN_cmd_CHAS_3508(int16_t motor1, int16_t motor2, int16_t motor3, int16_t motor4);
 extern void CAN_cmd_CHAS_6020(int16_t motor5, int16_t motor6, int16_t motor7, int16_t motor8);
 extern MOTOR_MEASURE_t *get_chassis_motor_measure_point(uint8_t i);
-#endif
 
 
 //#ifdef gimbal_board

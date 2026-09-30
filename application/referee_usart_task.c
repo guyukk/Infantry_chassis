@@ -172,8 +172,7 @@ void referee_unpack_fifo_data(void)
 
 void USART6_IRQHandler(void)
 {
-  
-  #ifdef chassis_board
+  /* 本工程固件为底盘板（chassis_board）：USART6 DMA 双缓冲接收裁判系统数据。 */
 	static volatile uint8_t res;
 	if(USART6->SR & UART_FLAG_IDLE)
 	{
@@ -202,6 +201,4 @@ void USART6_IRQHandler(void)
 			detect_hook(REFEREE_TOE);
 		}
 	}
-  #endif // DEBUG
-  
 }

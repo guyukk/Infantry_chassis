@@ -146,16 +146,15 @@ void uart1_data_receive(void)
 			//使能DMA
 			__HAL_DMA_ENABLE(&hdma_usart1_rx);
 			
-			#ifdef chassis_board
-				memcpy(gimbal_data, usart1_buf[0], GIMBAL_DATA_LENGTH);
-				//处理来自云台发送的信息
-				gimbal_to_chassis(gimbal_data);
-				
-				if(RC_TYPE == 1)
-				{
-					sbus_to_rc(sbus_rx_buf[1], &rc_ctrl);
-				}
-			#endif
+			/* 本工程固件为底盘板（chassis_board）：解包云台板发来的数据。 */
+			memcpy(gimbal_data, usart1_buf[0], GIMBAL_DATA_LENGTH);
+			//处理来自云台发送的信息
+			gimbal_to_chassis(gimbal_data);
+
+			if(RC_TYPE == 1)
+			{
+				sbus_to_rc(sbus_rx_buf[1], &rc_ctrl);
+			}
 		 }
 		else{
 			__HAL_DMA_DISABLE(&hdma_usart1_rx);
@@ -168,11 +167,10 @@ void uart1_data_receive(void)
 			//使能DMA
 			__HAL_DMA_ENABLE(&hdma_usart1_rx);
 			
-			#ifdef chassis_board
-				memcpy(gimbal_data, usart1_buf[1], GIMBAL_DATA_LENGTH);
-				//处理来自云台发送的信息
-				gimbal_to_chassis(gimbal_data);
-			#endif
+			/* 本工程固件为底盘板（chassis_board）：解包云台板发来的数据。 */
+			memcpy(gimbal_data, usart1_buf[1], GIMBAL_DATA_LENGTH);
+			//处理来自云台发送的信息
+			gimbal_to_chassis(gimbal_data);
 		}
 	}
 }

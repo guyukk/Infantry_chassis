@@ -13,7 +13,7 @@
 
 #include "struct_typedef.h"
 
-/* 当前工程配置：普通步兵、舵轮底盘；底盘板定义见 remote_control.h。 */
+/* 本工程固件配置：普通步兵 + 舵轮底盘 + 底盘板（chassis_board），无其他车型/板型选项。 */
 #define Infantry_robot 1
 #define steering_wheel 1
 
