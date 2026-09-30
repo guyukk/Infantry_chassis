@@ -26,7 +26,6 @@
 #include "chassis_power_control.h"
 #include "chassis_task.h"
 #include "cmsis_os.h"
-#include "detect_task.h"
 #include "INS_task.h"
 #include "iwdg.h"
 #include "pid.h"
@@ -508,11 +507,16 @@ void chassis_task(void const *pvParameters)
 	//HAL_IWDG_Refresh(&hiwdg);
 	chassis_init(&chassis_move); //åº•ç›˜åˆå§‹åŒ–
 	
-	//åˆ¤æ–­åº•ç›˜ç”µæœºæ˜¯å¦éƒ½åœ¨çº¿
-	while (toe_is_error(CHASSIS_MOTOR1_TOE) || toe_is_error(CHASSIS_MOTOR2_TOE) || toe_is_error(CHASSIS_MOTOR3_TOE) || toe_is_error(CHASSIS_MOTOR4_TOE) || \
-				 toe_is_error(CHASSIS_MOTOR5_TOE) || toe_is_error(CHASSIS_MOTOR6_TOE) || toe_is_error(CHASSIS_MOTOR7_TOE) || toe_is_error(CHASSIS_MOTOR8_TOE) || \
-				 toe_is_error(DBUS_TOE))
-	{ vTaskDelay(CHASSIS_CONTROL_TIME_MS); }
+	/*
+	 * ========================================================================
+	 * ²½Öè1£ºµ×ÅÌ¿ØÖÆÑ­»·ÓëÊä³öĞí¿ÉÅĞ¶Ï
+	 * ========================================================================
+	 * Êı¾İÔ´£ºÒ£¿ØÆ÷Êı¾İ£¨RC_data_is_error ÅĞ¶¨£©¡¢µ×ÅÌĞĞÎªÓë PID ¼ÆËã½á¹û
+	 * ²Ù×÷£º
+	 * 1) ÒÀ´ÎÖ´ĞĞÄ£Ê½ÉèÖÃ¡¢·´À¡¸üĞÂ¡¢¿ØÖÆÁ¿ÉèÖÃÓë PID ¼ÆËã
+	 * 2) Ò£¿ØÆ÷Êı¾İ·Ç·¨Ê±¸øµ×ÅÌµç»ú·¢ÁãµçÁ÷£¬Õı³£Ê±·¢ËÍ¿ØÖÆµçÁ÷
+	 */
+	while (1)
 	
 	while (1)
 	{
@@ -527,27 +531,21 @@ void chassis_task(void const *pvParameters)
 		//åº•ç›˜æ§åˆ¶PIDè®¡ç®—
 		chassis_control_loop(&chassis_move);
 
-		//ç¡®ä¿è‡³å°‘ä¸€ä¸ªç”µæœºåœ¨çº¿ï¼Œ è¿™æ ·CANæ§åˆ¶åŒ…å¯ä»¥è¢«æ¥æ”¶åˆ°
-		if (!(toe_is_error(CHASSIS_MOTOR1_TOE) && toe_is_error(CHASSIS_MOTOR2_TOE) && toe_is_error(CHASSIS_MOTOR3_TOE) && toe_is_error(CHASSIS_MOTOR4_TOE) && \
-					toe_is_error(CHASSIS_MOTOR5_TOE) && toe_is_error(CHASSIS_MOTOR6_TOE) && toe_is_error(CHASSIS_MOTOR7_TOE) && toe_is_error(CHASSIS_MOTOR8_TOE)))
+		// 1.1 Ò£¿ØÆ÷Êı¾İ·Ç·¨Ê±Çå¿ÕÊä³ö£¬±ÜÃâÓÃ²ĞÁôÊı¾İÇı¶¯µ×ÅÌ
+		if (RC_data_is_error())
 		{
-			//å½“é¥æ§å™¨æ‰çº¿çš„æ—¶å€™ï¼Œå‘é€ç»™åº•ç›˜ç”µæœºé›¶ç”µæµ.
-			if (toe_is_error(DBUS_TOE))
-			{
-				CAN_cmd_CHAS_6020(0, 0, 0, 0);
-				CAN_cmd_CHAS_3508(0, 0, 0, 0);
-			}
-			else
-			{
-
-				//å‘é€æ§åˆ¶ç”µæµ
-				CAN_cmd_CHAS_6020(chassis_move.chassis_6020[0].give_current, chassis_move.chassis_6020[1].give_current,
-													chassis_move.chassis_6020[2].give_current, chassis_move.chassis_6020[3].give_current);
-				CAN_cmd_CHAS_3508(chassis_move.chassis_3508[0].give_current,chassis_move.chassis_3508[1].give_current,
-													chassis_move.chassis_3508[2].give_current,chassis_move.chassis_3508[3].give_current);
-				
-				HAL_IWDG_Refresh(&hiwdg);
-			}
+			CAN_cmd_CHAS_6020(0, 0, 0, 0);
+			CAN_cmd_CHAS_3508(0, 0, 0, 0);
+		}
+		else
+		{
+			// 1.2 ·¢ËÍ¿ØÖÆµçÁ÷
+			CAN_cmd_CHAS_6020(chassis_move.chassis_6020[0].give_current, chassis_move.chassis_6020[1].give_current,
+												chassis_move.chassis_6020[2].give_current, chassis_move.chassis_6020[3].give_current);
+			CAN_cmd_CHAS_3508(chassis_move.chassis_3508[0].give_current,chassis_move.chassis_3508[1].give_current,
+												chassis_move.chassis_3508[2].give_current,chassis_move.chassis_3508[3].give_current);
+			
+			HAL_IWDG_Refresh(&hiwdg);
 		}
 		//ç³»ç»Ÿå»¶æ—¶
 		//vTaskDelay(CHASSIS_CONTROL_TIME_MS);

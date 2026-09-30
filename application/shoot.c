@@ -28,7 +28,6 @@
 
 #include "CAN_receive.h"
 #include "gimbal_behaviour.h"
-#include "detect_task.h"
 #include "pid.h"
 
 #define shoot_fric1_on(pwm) fric1_on((pwm)) //摩擦轮1pwm宏定义

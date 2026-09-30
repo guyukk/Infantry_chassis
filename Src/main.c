@@ -41,16 +41,13 @@
 #include "bsp_usart.h"
 #include "calibrate_task.h"
 #include "chassis_task.h"
-#include "detect_task.h"
 #include "gimbal_task.h"
 #include "INS_task.h"
 #include "led_flow_task.h"
-#include "oled_task.h"
 #include "referee.h"
 #include "referee_usart_task.h"
 #include "remote_control.h"
 #include "video_transmission_module.h"
-#include "voltage_task.h"
 
 /* USER CODE END Includes */
 
@@ -152,6 +149,9 @@ int main(void)
 	usart1_tx_dma_init();
 	
 	vtm_data_init();
+
+	// 1.1 USB Device/CDC 栈初始化，原由已删除的 test_task 调用，现改为调度器启动前执行
+	MX_USB_DEVICE_Init();
 	
   /* USER CODE END 2 */
 

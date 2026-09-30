@@ -29,7 +29,7 @@
 /*电机数据结构体*/
 typedef struct
 {
-	uint16_t	ecd;						//当前角度
+	uint16_t	ecd;			//当前角度
 	int16_t		speed_rpm;      //当前转速
 	int16_t		given_current;  //当前实际扭矩电流
 	uint8_t		temperate;      //当前温度

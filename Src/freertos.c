@@ -29,10 +29,8 @@
 
 #include "calibrate_task.h"
 #include "chassis_task.h"
-#include "detect_task.h"
 #include "INS_task.h"
 #include "led_flow_task.h"
-#include "oled_task.h"
 #include "referee_usart_task.h"
 #include "remote_control.h"
 #include "servo_task.h"
@@ -46,10 +44,8 @@
 
 osThreadId calibrate_tast_handle;
 osThreadId chassisTaskHandle;
-osThreadId detect_handle;
 osThreadId imuTaskHandle;
 osThreadId led_RGB_flow_handle;
-osThreadId oled_handle;
 osThreadId referee_usart_task_handle;
 osThreadId servo_task_handle;
 osThreadId message_task_handle;
@@ -72,14 +68,10 @@ osThreadId UI_task_handle;
 /* USER CODE BEGIN Variables */
 
 /* USER CODE END Variables */
-osThreadId testHandle;
-
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
    
 /* USER CODE END FunctionPrototypes */
-
-void test_task(void const * argument);
 
 extern void MX_USB_DEVICE_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -143,10 +135,6 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* definition and creation of test */
-  osThreadDef(test, test_task, osPriorityNormal, 0, 128);
-  testHandle = osThreadCreate(osThread(test), NULL);
-
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
 	osThreadDef(message, message_task, osPriorityNormal, 0, 128);
@@ -157,9 +145,6 @@ void MX_FREERTOS_Init(void) {
 
 	osThreadDef(led, led_RGB_flow_task, osPriorityNormal, 0, 128);
 	led_RGB_flow_handle = osThreadCreate(osThread(led), NULL);
-
-	osThreadDef(OLED, oled_task, osPriorityLow, 0, 256);
-	oled_handle = osThreadCreate(osThread(OLED), NULL);
 
 	/* 本工程固件为底盘板（chassis_board）：创建底盘与裁判系统任务。 */
 	osThreadDef(ChassisTask, chassis_task, osPriorityHigh , 0, 1024);
@@ -178,26 +163,6 @@ void MX_FREERTOS_Init(void) {
 	UI_task_handle = osThreadCreate(osThread(UI), NULL);
   /* USER CODE END RTOS_THREADS */
 
-}
-
-/* USER CODE BEGIN Header_test_task */
-/**
-  * @brief  Function implementing the test thread.
-  * @param  argument: Not used 
-  * @retval None
-  */
-/* USER CODE END Header_test_task */
-__weak void test_task(void const * argument)
-{
-  /* init code for USB_DEVICE */
-  MX_USB_DEVICE_Init();
-  /* USER CODE BEGIN test_task */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END test_task */
 }
 
 /* Private application code --------------------------------------------------*/

@@ -13,9 +13,8 @@
 
 #include "struct_typedef.h"
 
-/* 本工程固件配置：普通步兵 + 舵轮底盘 + 底盘板（chassis_board），无其他车型/板型选项。 */
-#define Infantry_robot 1
-#define steering_wheel 1
+/* 本工程固件配置：普通步兵 + 舵轮底盘 + 底盘板，无其他车型/板型选项。 */
+
 
 /* 底盘外形尺寸：长、宽均为 29.803，宏保存半长和半宽。 */
 #define HALF_LENGTH 14.9015f

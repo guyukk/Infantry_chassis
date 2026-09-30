@@ -13,7 +13,6 @@
 #include "chassis_behaviour.h"
 
 #include "shoot.h"
-#include "voltage_task.h"
 #include "CRC8_CRC16.h"
 #include "GRAVITY.h"
 #include "tim.h"

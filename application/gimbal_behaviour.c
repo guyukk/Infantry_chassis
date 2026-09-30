@@ -80,9 +80,9 @@
   */
 
 #include "gimbal_behaviour.h"
+#include "remote_control.h"
 #include "arm_math.h"
 #include "bsp_buzzer.h"
-#include "detect_task.h"
 #include "user_lib.h"
 #include "bsp_usart.h"
 
@@ -469,7 +469,7 @@ static void gimbal_behavour_set(gimbal_control_t *gimbal_mode_set)
     }
     //if other operate make step change to start, means enter cali mode
     //如果外部使得校准步骤从0 变成 start，则进入校准模式
-    if (gimbal_mode_set->gimbal_cali.step == GIMBAL_CALI_START_STEP && !toe_is_error(DBUS_TOE))
+    if (gimbal_mode_set->gimbal_cali.step == GIMBAL_CALI_START_STEP && !RC_data_is_error())
     {
         gimbal_behaviour = GIMBAL_CALI;
         return;
@@ -503,7 +503,7 @@ static void gimbal_behavour_set(gimbal_control_t *gimbal_mode_set)
 
         //超过初始化最大时间，或者已经稳定到中值一段时间，退出初始化状态开关打下档，或者掉线
         if (init_time < GIMBAL_INIT_TIME && init_stop_time < GIMBAL_INIT_STOP_TIME &&
-            !switch_is_mid(gimbal_mode_set->gimbal_rc_ctrl->rc.s[GIMBAL_MODE_CHANNEL]) && !toe_is_error(DBUS_TOE))
+            !switch_is_mid(gimbal_mode_set->gimbal_rc_ctrl->rc.s[GIMBAL_MODE_CHANNEL]) && !RC_data_is_error())
         {
             return;
         }
@@ -541,7 +541,7 @@ static void gimbal_behavour_set(gimbal_control_t *gimbal_mode_set)
 		
  
     
-    if( toe_is_error(DBUS_TOE))
+    if( RC_data_is_error())
     {
         gimbal_behaviour = GIMBAL_ZERO_FORCE;
     }

@@ -6,7 +6,6 @@
 #include "arm_math.h"
 #include "CAN_receive.h"
 #include "user_lib.h"
-#include "detect_task.h"
 #include "remote_control.h"
 #include "gimbal_behaviour.h"
 #include "INS_task.h"

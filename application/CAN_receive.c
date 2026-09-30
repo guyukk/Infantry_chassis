@@ -23,7 +23,6 @@
 #include "cmsis_os.h"
 #include "bsp_rng.h"
 #include "bsp_usart.h"
-#include "detect_task.h"
 
 //电机数据读取
 #define get_motor_measure(ptr, data)                                \
@@ -70,7 +69,6 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 			static uint8_t i = 0;
 			i = rx_header.StdId - CAN1_3508_M1_ID;
 			get_motor_measure(&motor_chas[i], rx_data);
-			detect_hook(CHASSIS_MOTOR1_TOE + i);
 			break;
 		}
 		case 0x600:
@@ -182,7 +180,6 @@ static MOTOR_MEASURE_t motor_gimb[3];	//云台上有5个电机(没算那两个�
 //			i = rx_header.StdId - CAN1_PLUCK_ID;
 //			if((i == 2) | (i == 3)) i -= 1;		//由于2006的ID为0x203,而6020电机的ID为0x205和0x206
 //			get_motor_measure(&motor_gimb[i], rx_data);
-//			detect_hook(PLUCK_MOTOR_TOE + i);
 //			break;
 //		}
 //		

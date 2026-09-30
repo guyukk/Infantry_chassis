@@ -29,9 +29,7 @@
 #include "arm_math.h"
 #include "chassis_power_control.h"
 #include "chassis_task.h"
-#include "detect_task.h"
 #include "referee.h"
-#include "voltage_task.h"
 #include <stdbool.h>
 #include "pm01_api.h"
 

@@ -24,18 +24,6 @@ static uint16_t adcx_get_chx_value(ADC_HandleTypeDef *ADCx, uint32_t ch)
     return (uint16_t)HAL_ADC_GetValue(ADCx);
 
 }
-void init_vrefint_reciprocal(void)
-{
-    uint8_t i = 0;
-    uint32_t total_adc = 0;
-    for(i = 0; i < 200; i++)
-    {
-        total_adc += adcx_get_chx_value(&hadc1, ADC_CHANNEL_VREFINT);
-    }
-
-    voltage_vrefint_proportion = 200 * 1.2f / total_adc;
-
-}
 fp32 get_temprate(void)
 {
     uint16_t adcx = 0;
@@ -49,16 +37,6 @@ fp32 get_temprate(void)
 }
 
 
-fp32 get_battery_voltage(void)
-{
-    fp32 voltage;
-    uint16_t adcx = 0;
-
-    adcx = adcx_get_chx_value(&hadc3, ADC_CHANNEL_8);
-    voltage =  (fp32)adcx * voltage_vrefint_proportion * 10.090909090909090909090909090909f;
-
-    return voltage;
-}
 
 uint8_t get_hardware_version(void)
 {
