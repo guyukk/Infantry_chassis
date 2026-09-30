@@ -30,14 +30,11 @@
 #include "calibrate_task.h"
 #include "chassis_task.h"
 #include "detect_task.h"
-#include "gimbal_task.h"
 #include "INS_task.h"
 #include "led_flow_task.h"
 #include "oled_task.h"
 #include "referee_usart_task.h"
 #include "remote_control.h"
-#include "usb_task.h"
-#include "voltage_task.h"
 #include "servo_task.h"
 #include "message_task.h"
 #include "idle.h"
@@ -50,13 +47,10 @@
 osThreadId calibrate_tast_handle;
 osThreadId chassisTaskHandle;
 osThreadId detect_handle;
-osThreadId gimbalTaskHandle;
 osThreadId imuTaskHandle;
 osThreadId led_RGB_flow_handle;
 osThreadId oled_handle;
 osThreadId referee_usart_task_handle;
-osThreadId usb_task_handle;
-osThreadId battery_voltage_handle;
 osThreadId servo_task_handle;
 osThreadId message_task_handle;
 osThreadId idle_task_handle;
@@ -173,14 +167,6 @@ void MX_FREERTOS_Init(void) {
 	
 	osThreadDef(REFEREE, referee_usart_task, osPriorityNormal, 0, 128);
 	referee_usart_task_handle = osThreadCreate(osThread(REFEREE), NULL);
-#endif // DEBUG
-
-#ifdef gimbal_board
-	osThreadDef(gimbalTask, gimbal_task, osPriorityHigh, 0, 1024);
-	gimbalTaskHandle = osThreadCreate(osThread(gimbalTask), NULL);
-	
-	osThreadDef(BATTERY_VOLTAGE, battery_voltage_task, osPriorityNormal, 0, 64);
-	battery_voltage_handle = osThreadCreate(osThread(BATTERY_VOLTAGE), NULL);
 #endif // DEBUG
 
 	osThreadDef(SERVO, servo_task, osPriorityNormal, 0, 128);

@@ -37,7 +37,6 @@ extern void usart1_tx_dma_enable(uint8_t *data, uint16_t len);
 extern void usart1_rx_complete_callback(uint8_t *buf, uint16_t len);
 extern void usart6_init(uint8_t *rx0_buf, uint8_t *rx1_buf, uint16_t dma_buf_num);
 extern void usart6_tx_dma_enable(uint8_t *data, uint16_t len);
-extern void usart6_rx_complete_callback(uint8_t *buf, uint16_t len);
 extern void chassis_to_gimbal(uint8_t *gimbal_data);
 extern void gimbal_to_chassis(uint8_t *gimbal_data);
 extern int uart6_printf(const char *format, ...);

@@ -27,7 +27,6 @@
 //用在云台上的开发板gimbal_board
 //用在底盘上的开发板chassis_board
 #define chassis_board 1
-//#define gimbal_board 1
 
 #define RC_CH_VALUE_MIN         ((uint16_t)364)
 #define RC_CH_VALUE_OFFSET      ((uint16_t)1024)

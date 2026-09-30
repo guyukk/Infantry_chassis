@@ -38,11 +38,8 @@
 					Engineer_robot
 */
 
-//英雄宏定义
-#define Hero_robot 1
-
 //普通步兵宏定义
-//#define Infantry_robot 1
+#define Infantry_robot 1
 
 ////平衡步兵宏定义
 //#define Balance_robot 1

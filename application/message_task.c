@@ -1,5 +1,4 @@
 #include "message_task.h"
-#include "gimbal_task.h"
 #include "chassis_power_control.h"
 #include "main.h"
 #include "cmsis_os.h"
@@ -14,13 +13,10 @@
 #include "shoot.h"
 #include "pid.h"
 #include "chassis_task.h"
-#include "gimbal_task.h"
-#include "auto_aim.h"
 #include "chassis_behaviour.h"
 #include "protocol.h"
 
 
-static void send_data_to_chassis(gimbal_control_t *feedback_update);
 static void send_to_gimbal(void);
 
 
@@ -35,12 +31,6 @@ void message_task(void const *pvParameters)
     vTaskDelay(MESSAGE_TASK_INIT_TIME * 5);
 
     while(1) {
-      #ifdef gimbal_board
-        send_data_to_chassis(&gimbal_control);
-				send_to_minipc();
-				vTaskDelay(MESSAGE_TASK_INIT_TIME);  // 每次循环的延迟 
-      #endif // DEBUG
-			
       #ifdef chassis_board
         send_to_gimbal();
 				vTaskDelay(MESSAGE_TASK_INIT_TIME * 2);

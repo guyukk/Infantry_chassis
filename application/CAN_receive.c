@@ -19,6 +19,7 @@
 	********************************************************************************/
 
 #include "CAN_receive.h"
+#include "pm01_api.h"
 #include "cmsis_os.h"
 #include "bsp_rng.h"
 #include "bsp_usart.h"

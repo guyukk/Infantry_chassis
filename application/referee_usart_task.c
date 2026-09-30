@@ -204,36 +204,4 @@ void USART6_IRQHandler(void)
 	}
   #endif // DEBUG
   
-  #ifdef gimbal_board
-  if(USART6->SR & UART_FLAG_IDLE)
-  {
-		__HAL_UART_CLEAR_PEFLAG(&huart6);
-		static uint16_t this_time_rx_len = 0;
-
-		if ((huart6.hdmarx->Instance->CR & DMA_SxCR_CT) == RESET)
-		{
-			__HAL_DMA_DISABLE(huart6.hdmarx);
-			this_time_rx_len = USART_RX_BUF_LENGHT - __HAL_DMA_GET_COUNTER(huart6.hdmarx);
-			__HAL_DMA_SET_COUNTER(huart6.hdmarx, USART_RX_BUF_LENGHT  );
-			huart6.hdmarx->Instance->CR |= DMA_SxCR_CT;
-			__HAL_DMA_ENABLE(huart6.hdmarx);
-			if(this_time_rx_len == 10u)
-			{
-				usart6_rx_complete_callback(usart6_buf[0], this_time_rx_len);
-			}
-		}
-		else
-		{
-			__HAL_DMA_DISABLE(huart6.hdmarx);
-			this_time_rx_len = USART_RX_BUF_LENGHT - __HAL_DMA_GET_COUNTER(huart6.hdmarx);
-			__HAL_DMA_SET_COUNTER(huart6.hdmarx, USART_RX_BUF_LENGHT  );
-			huart6.hdmarx->Instance->CR &= ~(DMA_SxCR_CT);
-			__HAL_DMA_ENABLE(huart6.hdmarx);
-			if(this_time_rx_len == 10u )
-			{
-				usart6_rx_complete_callback(usart6_buf[1], this_time_rx_len);
-			}
-		}
-  }
-  #endif // DEBUG
 }

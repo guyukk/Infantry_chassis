@@ -49,7 +49,6 @@
 #include "referee.h"
 #include "referee_usart_task.h"
 #include "remote_control.h"
-#include "usb_task.h"
 #include "video_transmission_module.h"
 #include "voltage_task.h"
 

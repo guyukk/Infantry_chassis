@@ -1,4 +1,3 @@
-#include "auto_aim.h"
 #include "bsp_buzzer.h"
 #include "bsp_usart.h"
 #include "chassis_power_control.h"
@@ -6,7 +5,6 @@
 #include "referee_usart_task.h"
 #include "remote_control.h"
 #include "robot_param.h"
-#include "usb_task.h"
 #include <stdarg.h>
 #include <stdio.h>
 #include "string.h"
@@ -30,9 +28,7 @@ extern RC_ctrl_t rc_ctrl;
 uint8_t gimbal_data[GIMBAL_DATA_LENGTH] = {0};
 uint8_t usart1_buf[2][USART_BUF_LENGHT];//设置双缓冲区
 uint8_t data_send_from_pc[ USART_BUF_LENGHT/2] = {0};
-uint8_t data_send_from_pc6[ USART_BUF_LENGHT ] = {0};
 uint8_t data_send_from_chassis[ USART_BUF_LENGHT] = {0};
-uint8_t restart_array[10]={0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};//请求重新发送数据
 
 void usart1_init(void)
 {
@@ -138,8 +134,6 @@ void usart6_tx_dma_enable(uint8_t *data, uint16_t len)
 //底盘、云台的数据接收
 void uart1_data_receive(void)
 {
-	static uint16_t this_time_rx_len = 0;
-	
 	if(USART1->SR & UART_FLAG_IDLE)
 	{
 		__HAL_UART_CLEAR_PEFLAG(&huart1);
@@ -147,9 +141,6 @@ void uart1_data_receive(void)
 		if ((hdma_usart1_rx.Instance->CR & DMA_SxCR_CT) == RESET)
 		{
 			__HAL_DMA_DISABLE(&hdma_usart1_rx);
-
-			//获取接收数据长度,长度 = 设定长度 - 剩余长度
-			this_time_rx_len = USART_BUF_LENGHT - hdma_usart1_rx.Instance->NDTR;
 
 			hdma_usart1_rx.Instance->NDTR = USART_BUF_LENGHT;
 
@@ -172,9 +163,6 @@ void uart1_data_receive(void)
 		 }
 		else{
 			__HAL_DMA_DISABLE(&hdma_usart1_rx);
-
-			//获取接收数据长度,长度 = 设定长度 - 剩余长度
-			this_time_rx_len = USART_BUF_LENGHT - hdma_usart1_rx.Instance->NDTR;
 
 			hdma_usart1_rx.Instance->NDTR = USART_BUF_LENGHT;
 
@@ -235,19 +223,6 @@ void usart6_init(uint8_t *rx0_buf, uint8_t *rx1_buf, uint16_t dma_buf_num)
 	}
 
 	hdma_usart6_tx.Instance->PAR = (uint32_t) & (USART6->DR);
-}
-
-//串口6的回调函数
-void usart6_rx_complete_callback(uint8_t *buf, uint16_t len) {
-	// 先验证数据包格式是否正确
-  // 拷贝接收到的数据到data_send_from_pc
-  if (buf[0] == 's' || buf[9] == 'e') {
-		memcpy(data_send_from_pc6, buf, len);
-		auto_aim(data_send_from_pc6);
-  }
-  else{
-    usart6_tx_dma_enable(restart_array,len);
-  }
 }
 
 //这些变量用于下面的函数

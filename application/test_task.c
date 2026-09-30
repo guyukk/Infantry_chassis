@@ -15,7 +15,6 @@
   ****************************(C) COPYRIGHT 2019 DJI****************************
   */
 
-#include "test_task.h"
 #include "main.h"
 #include "cmsis_os.h"
 #include "bsp_buzzer.h"

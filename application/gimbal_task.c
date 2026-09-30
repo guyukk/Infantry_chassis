@@ -725,7 +725,6 @@ static void gimbal_feedback_update(gimbal_control_t *feedback_update)
     feedback_update->gimbal_yaw_motor.motor_gyro = arm_cos_f32(feedback_update->gimbal_pitch_motor.relative_angle) * (*(feedback_update->gimbal_INT_gyro_point + INS_GYRO_Z_ADDRESS_OFFSET))
                                                         - arm_sin_f32(feedback_update->gimbal_pitch_motor.relative_angle) * (*(feedback_update->gimbal_INT_gyro_point + INS_GYRO_X_ADDRESS_OFFSET));
     //发送云台数据（陀螺仪的yaw值fp32、yaw轴编码器的值fp32）  
-    //send_data_to_chassis(feedback_update);                                                  
 }
 
 /**
@@ -884,15 +883,11 @@ static void gimbal_set_control(gimbal_control_t *set_control)
   */
 void gimbal_absolute_angle_limit(gimbal_motor_t *gimbal_motor, fp32 add)
 {
-    static fp32 bias_angle;
     static fp32 angle_set;
     if (gimbal_motor == NULL)
     {
         return;
     }
-    // now angle error
-    // 当前控制误差角度
-    bias_angle = rad_format(gimbal_motor->absolute_angle_set - gimbal_motor->absolute_angle);
     // relative angle + angle error + add_angle > max_relative angle
     // 云台相对角度 + 误差角度 + 新增角度 是否超过最大机械角度
 //    if (gimbal_motor->relative_angle + bias_angle + add > gimbal_motor->max_relative_angle)
