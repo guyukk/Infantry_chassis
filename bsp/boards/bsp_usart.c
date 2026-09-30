@@ -20,10 +20,6 @@ extern VTM_Data_t vtm_data;
 extern RC_ctrl_t rc_ctrl;
 extern const uint8_t RC_TYPE;
 
-#ifdef Sentinel_robot
-extern RC_ctrl_t rc_ctrl;
-#endif
-
 //#define DMA_FLAG_TCIF5 ((uint32_t)0x20000800)
 uint8_t gimbal_data[GIMBAL_DATA_LENGTH] = {0};
 uint8_t usart1_buf[2][USART_BUF_LENGHT];//设置双缓冲区
@@ -237,11 +233,6 @@ void gimbal_to_chassis(uint8_t *gimbal_data)
 	static fp32_to_bytes INS_pitch_now;			//存储INS指针, 用于记录云台imu的pitch值
 	static fp32_to_bytes INS_roll_now;			//存储INS指针, 用于记录云台imu的roll值
 	
-#ifdef Sentinel_robot	//云台板通过板件通信控制底盘，相关指令
-	static int_to_bytes order_now[4];
-	static uint8_t mode_now[2];
-#endif	
-	
 	static uint8_t gimbal_behaviour_now;		//云台行为模式
 	static uint8_t gimbal_shoot_mode_now;		//射击模式
 	
@@ -291,31 +282,6 @@ void gimbal_to_chassis(uint8_t *gimbal_data)
 	for(uint8_t i = 0; i <= 25; i ++)
 	{
 		vtm_data_ptr[2 + i] = gimbal_data[19 + i];
-	}
-	
-#ifdef Sentinel_robot
-	order_now[0].bytes[0] = gimbal_data[19];
-	order_now[0].bytes[1] = gimbal_data[20];
-	rc_ctrl.rc.ch[0] = order_now[0].int16;
-	
-	order_now[1].bytes[0] = gimbal_data[21];
-	order_now[1].bytes[1] = gimbal_data[22];
-	rc_ctrl.rc.ch[1] = -order_now[1].int16;
-	
-	order_now[2].bytes[0] = gimbal_data[23];
-	order_now[2].bytes[1] = gimbal_data[24];
-	rc_ctrl.rc.ch[2] = -order_now[2].int16;
-	
-	order_now[3].bytes[0] = gimbal_data[25];
-	order_now[3].bytes[1] = gimbal_data[26];
-	rc_ctrl.rc.ch[3] = order_now[3].int16;
-	
-	mode_now[0] = gimbal_data[27];
-	rc_ctrl.rc.s[0] = mode_now[0];
-	mode_now[1] = gimbal_data[28];
-	rc_ctrl.rc.s[1] = mode_now[1];
-#endif
-	
 //	if(chassis_move.chassis_mode == CHASSIS_VECTOR_SPIN)
 //	{
 //		if((last_gimbal_radian_of_ecd - chassis_move.gimbal_radian_of_ecd == 0))
@@ -335,6 +301,7 @@ void gimbal_to_chassis(uint8_t *gimbal_data)
 //		else{ error_count = 0; }
 //	}
 //	last_gimbal_radian_of_ecd = chassis_move.gimbal_radian_of_ecd;
+}
 }
 
 /****************** 串口调试 ******************/

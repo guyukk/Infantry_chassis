@@ -41,23 +41,7 @@
 #define LIMIT_MAX_MIN(val, max, min) ((val) > (max) ? (max) : ((val) < (min) ? (min) : (val)))
 #endif
 
-/**
- * @brief 根据机器人类型配置额定功率值
- * @note  不同类型机器人的供电功率上限不同，需匹配官方规范
- */
-#ifdef Hero_robot
-    #define SET_POWER_VALUE 100.0f  // 英雄机器人额定功率 (W)
-#elif defined(Infantry_robot)
-    #define SET_POWER_VALUE 90.0f   // 步兵机器人额定功率 (W)
-#elif defined(Engineer_robot)
-    #define SET_POWER_VALUE 100.0f  // 工程机器人额定功率 (W)
-#elif defined(Sentinel_robot)
-    #define SET_POWER_VALUE 100.0f   // 哨兵机器人额定功率 (W)
-#elif defined(Balance_robot)
-    #define SET_POWER_VALUE 75.0f   // 平衡机器人额定功率 (W)
-#else
-    #define SET_POWER_VALUE 75.0f   // 默认额定功率 (W)
-#endif
+#define SET_POWER_VALUE 90.0f
 
 //超级电容状态枚举
 typedef enum {

@@ -8,11 +8,7 @@
 
 #define USART_BUF_LENGHT			90
 
-#ifdef Sentinel_robot
-	#define GIMBAL_DATA_LENGTH		30
-#else
-	#define GIMBAL_DATA_LENGTH		46
-#endif
+#define GIMBAL_DATA_LENGTH		46
 
 // 定义一个联合类型，用于将浮点数转换为字节
 typedef union {
