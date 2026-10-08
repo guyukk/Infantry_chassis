@@ -34,10 +34,10 @@
   */
 void chassis_wheel_angle_offset_init(void)
 {
-	chassis_move.wheel_angle_offset.now[0] = chassis_move.wheel_angle_offset.initial[0] = chassis_move.wheel_angle_offset.initial[0] = CHASSIS_6020_INIT_ANGLE_0;
-	chassis_move.wheel_angle_offset.now[1] = chassis_move.wheel_angle_offset.initial[1] = chassis_move.wheel_angle_offset.initial[1] = CHASSIS_6020_INIT_ANGLE_1;
-	chassis_move.wheel_angle_offset.now[2] = chassis_move.wheel_angle_offset.initial[2] = chassis_move.wheel_angle_offset.initial[2] = CHASSIS_6020_INIT_ANGLE_2;
-	chassis_move.wheel_angle_offset.now[3] = chassis_move.wheel_angle_offset.initial[3] = chassis_move.wheel_angle_offset.initial[3] = CHASSIS_6020_INIT_ANGLE_3;
+	chassis_move.wheel_angle_offset.now[0] = chassis_move.wheel_angle_offset.initial[0] = CHASSIS_6020_INIT_ANGLE_0;
+	chassis_move.wheel_angle_offset.now[1] = chassis_move.wheel_angle_offset.initial[1] = CHASSIS_6020_INIT_ANGLE_1;
+	chassis_move.wheel_angle_offset.now[2] = chassis_move.wheel_angle_offset.initial[2] = CHASSIS_6020_INIT_ANGLE_2;
+	chassis_move.wheel_angle_offset.now[3] = chassis_move.wheel_angle_offset.initial[3] = CHASSIS_6020_INIT_ANGLE_3;
 }
 
 /**
@@ -62,43 +62,6 @@ void vector_rotate(fp32 angle, fp32 *vector)
 	//计算旋转变换后的向量														//旋转矩阵为：
 	vector[0] = cos * x_temp - sin * vector[1];       //{{cos, -sin},
 	vector[1] = sin * x_temp + cos * vector[1];       // {sin,  cos}}
-}
-
-/**
-  * @brief          运动学逆解算纵享丝滑控制策略
-  * @param[in&out]  wheel_angle     舵轮的目标角度
-  * @param[in&out]  wheel_speed     舵轮的目标速度
-  * @retval         none
-  */
-static void smooth_control(fp32 *wheel_angle, fp32 *wheel_speed)
-{
-	fp32 factor = 0.50f;
-
-	// 定义当前的舵轮角度、舵轮目标角度与当前角度差
-	fp32 angle_delta[4], Current_angle[4];
-	for(uint8_t i = 0; i < 4; i++)
-	{
-		// 获取舵轮当前的角度
-		Current_angle[i] = chassis_move.chassis_6020[i].angle;
-
-		// 计算舵轮目标角度与当前角度差，并规范化到[-π, π]范围
-		angle_delta[i] = rad_format(wheel_angle[i] - Current_angle[i]);
-
-		// 就近转位策略
-		if(angle_delta[i] > PI * factor)				//如果角度差大于90度
-		{
-			wheel_angle[i] -= PI;       					//目标角度减180度
-			wheel_speed[i] = -wheel_speed[i];			//速度反向
-		}
-		else if(angle_delta[i] < -PI * factor)  //如果角度差小于-90度
-		{
-			wheel_angle[i] += PI;        					//目标角度加180度
-			wheel_speed[i] = -wheel_speed[i]; 		//速度反向
-		}
-
-		// 确保最终角度在合理范围内
-		wheel_angle[i] = rad_format(wheel_angle[i]);
-	}
 }
 
 //fp32 offset[4] = {1.30f, 2.14f, 1.67f, 2.13f};
@@ -155,7 +118,6 @@ void chas_inv_cal(fp32 vx_set, fp32 vy_set, fp32 wz_set, fp32 *wheel_angle, fp32
 		wheel_angle[i] = rad_format(wheel_angle[i]);
 	}
 	
-	smooth_control(wheel_angle, wheel_speed);
 }
 
 /**

@@ -1,0 +1,17 @@
+{
+  "Board": "chassis",
+  "Target": "standard_tpye_c",
+  "Project": "D:\\文档\\Printk\\bubing\\chassis\\F4\\F4\\standard_tpye_c\\standard_tpye_c\\MDK-ARM\\standard_tpye_c.uvprojx",
+  "ExitCode": 0,
+  "Started": "2026-10-08T22:22:21.8657943+08:00",
+  "Seconds": 29.86,
+  "Log": "D:\\文档\\Printk\\bubing\\chassis\\F4\\F4\\standard_tpye_c\\standard_tpye_c\\AI_Workspace\\artifacts\\soft-turn\\build-first\\chassis.log",
+  "Summary": [
+    "Program Size: Code=81180 RO-data=4648 RW-data=976 ZI-data=59560  ",
+    "\".\\standard_tpye_c\\standard_tpye_c.axf\" - 0 Error(s), 0 Warning(s).",
+    "Build Time Elapsed:  00:00:27"
+  ],
+  "Image": "D:\\文档\\Printk\\bubing\\chassis\\F4\\F4\\standard_tpye_c\\standard_tpye_c\\MDK-ARM\\.\\standard_tpye_c\\standard_tpye_c.axf",
+  "ImageSHA256": "3370FE98A1A1F605C4FED57EC9F35D8B587E487218C6A58366E83E72B5F8A8F2",
+  "Success": true
+}

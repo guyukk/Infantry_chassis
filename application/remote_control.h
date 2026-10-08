@@ -86,6 +86,7 @@ static uint8_t sbus_rx_buf[2][SBUS_RX_BUF_NUM];
 
 extern void remote_control_init(void);
 extern const RC_ctrl_t *get_remote_control_point(void);
+extern uint32_t get_remote_control_generation(void);
 extern uint8_t RC_data_is_error(void);
 extern void slove_RC_lost(void);
 extern void slove_data_error(void);

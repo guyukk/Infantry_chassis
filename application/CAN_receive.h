@@ -64,6 +64,7 @@ typedef enum
 extern void CAN_cmd_CHAS_3508(int16_t motor1, int16_t motor2, int16_t motor3, int16_t motor4);
 extern void CAN_cmd_CHAS_6020(int16_t motor5, int16_t motor6, int16_t motor7, int16_t motor8);
 extern MOTOR_MEASURE_t *get_chassis_motor_measure_point(uint8_t i);
+extern uint8_t chassis_motor_feedback_ready(void);
 
 
 #endif

@@ -21,6 +21,7 @@
 #include "referee_usart_task.h"
 #include "main.h"
 #include "cmsis_os.h"
+#include "robot_param.h"
 
 #include "remote_control.h"
 #include "bsp_usart.h"
@@ -171,6 +172,11 @@ void referee_unpack_fifo_data(void)
 
 void USART6_IRQHandler(void)
 {
+#if CHASSIS_SOFT_TURN_TELEMETRY
+    /* HAL DMA TX becomes ready only after the last byte's UART TC event. */
+    if ((USART6->SR & USART_SR_TC) && (USART6->CR1 & USART_CR1_TCIE))
+        HAL_UART_IRQHandler(&huart6);
+#endif
   /* 本工程固件为底盘板（chassis_board）：USART6 DMA 双缓冲接收裁判系统数据。 */
 	static volatile uint8_t res;
 	if(USART6->SR & UART_FLAG_IDLE)

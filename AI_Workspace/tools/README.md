@@ -10,7 +10,16 @@
 - `snapshot.py verify <阶段包> --result <新结果路径>`：检查 ZIP 与清单完整性，并列出当前文件差异。比较旧包时使用 `--result` 保留历史证据。
 - `audit.py <阶段包>`：读取包内源码 ZIP 和 `build/results.json`，索引当前源码并保存新构建的固件、MAP、容量与警告。产物路径依据 `.uvprojx` 解析。对新阶段包执行，避免覆盖旧证据。
 
-## 既有验证
+## 软转向验证与路试日志
+
+- `validate_soft_turn.py`：ARMCC 编译实际软转向和控制源码，在 Unicorn 中检查变化率、模式与故障恢复；结果默认在 `../artifacts/soft-turn/validation/`，支持 `--cache` 和 `--results`。
+- `build_soft_turn_debug.ps1`：临时工程副本开启 USART6 50 Hz 日志，编译完成后移除副本；默认正式固件日志关闭。日志及 AXF/HEX 保存到新的证据目录，可指定 `-LogDirectory`。
+- `capture_soft_turn.ps1 -Port COM5 -Output <新bin文件> -Seconds 30`：用户完成接线后采集 115200/8N1 数据，不覆盖已有文件。
+- `soft_turn_log.py <bin文件> --output <新csv文件>`：检查 CRC 并重同步帧流，输出角度、速度、电流、姿态及状态 CSV，不覆盖已有文件。
+
+实车接线、默认参数和验收记录见 `../reports/软转向实施与验证.md`。这些工具不会自动烧录或启动采集。
+
+## 既有帧与校准验证
 
 Python 依赖位于 `../cache/dependencies/packages/`，为 Unicorn 2.1.4 和 pyelftools 0.32。重建方式：
 

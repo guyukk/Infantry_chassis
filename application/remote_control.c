@@ -33,6 +33,12 @@ extern VTM_Data_t vtm_data;
 
 //遥控器控制变量
 RC_ctrl_t rc_ctrl;
+static volatile uint32_t rc_generation;
+
+uint32_t get_remote_control_generation(void)
+{
+    return rc_generation;
+}
 
 //远程控制器类型: 0 - 遥控器		1 - 图传
 const uint8_t RC_TYPE = 0;
@@ -276,4 +282,5 @@ void sbus_to_rc(volatile const uint8_t *sbus_buf, RC_ctrl_t *rc_ctrl)
 		rc_ctrl->rc.ch[3] -= RC_CH_VALUE_OFFSET;
 		rc_ctrl->rc.ch[4] -= RC_CH_VALUE_OFFSET;
 	}
+    ++rc_generation;
 }

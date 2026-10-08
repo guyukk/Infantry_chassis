@@ -43,6 +43,12 @@ static CAN_TxHeaderTypeDef  chassis_tx_message;
 static uint8_t chassis_can_send_data[8];
 //static MOTOR_MEASURE_t motor_chas[8];	//底盘上有8个电机
 MOTOR_MEASURE_t motor_chas[8];	//底盘上有8个电机
+static volatile uint8_t motor_feedback_seen;
+
+uint8_t chassis_motor_feedback_ready(void)
+{
+	return motor_feedback_seen == 0xFFU;
+}
 	
 /**
   * @brief          HAL库CAN回调函数,接收底盘电机数据
@@ -54,7 +60,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 	CAN_RxHeaderTypeDef rx_header;
 	uint8_t rx_data[8];
 	
-	HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &rx_header, rx_data);
+	if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &rx_header, rx_data) != HAL_OK) return;
 	
 	switch (rx_header.StdId)
 	{
@@ -70,6 +76,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 			static uint8_t i = 0;
 			i = rx_header.StdId - CAN1_3508_M1_ID;
 			get_motor_measure(&motor_chas[i], rx_data);
+			motor_feedback_seen |= (uint8_t)(1U << i);
 			break;
 		}
 		case 0x600:

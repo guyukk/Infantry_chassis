@@ -1,0 +1,12 @@
+{
+  "Success": true,
+  "ExitCode": 0,
+  "Summary": [
+    "Program Size: Code=82192 RO-data=4644 RW-data=988 ZI-data=59908  ",
+    "\"..\\AI_Workspace\\cache\\keil\\soft-turn-debug\\standard_tpye_c_soft_turn_debug.axf\" - 0 Error(s), 0 Warning(s)."
+  ],
+  "Image": "D:\\文档\\Printk\\bubing\\chassis\\F4\\F4\\standard_tpye_c\\standard_tpye_c\\AI_Workspace\\cache\\keil\\soft-turn-debug\\standard_tpye_c_soft_turn_debug.axf",
+  "Telemetry": 1,
+  "Log": "D:\\文档\\Printk\\bubing\\chassis\\F4\\F4\\standard_tpye_c\\standard_tpye_c\\AI_Workspace\\artifacts\\soft-turn\\build-debug-final\\chassis-debug.log",
+  "ImageSHA256": "F9FE02971187F9B4AC403F6D5CBFDF557D7CB6DDE60B7FE01C2F30EAA1E44104"
+}

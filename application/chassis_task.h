@@ -27,6 +27,7 @@
 #include "remote_control.h"
 #include "user_lib.h"
 #include "INS_task.h"
+#include "chassis_soft_turn.h"
 
 #define CHASSIS_TASK_INIT_TIME 357	//任务开始空闲一段时间
 
@@ -41,15 +42,12 @@
 //遥控器左右摇杆（max 660）转化成车体左右速度（m/s）的比例
 #define CHASSIS_VY_RC_SEN 	0.004f	//0.006f
 
-#define CHASSIS_ACCEL_X_NUM 0.1666666667f
-#define CHASSIS_ACCEL_Y_NUM 0.3333333333f
-
 //摇杆死区
 #define CHASSIS_RC_DEADLINE 25
 
-#define CHASSIS_CONTROL_TIME_MS 		2				//底盘任务控制间隔 2ms
-#define CHASSIS_CONTROL_TIME				0.002f	//底盘任务控制间隔 0.002s
-#define CHASSIS_CONTROL_FREQUENCE		500.0f	//底盘任务控制频率
+#define CHASSIS_CONTROL_TIME_MS 1
+#define CHASSIS_CONTROL_TIME 0.001f
+#define CHASSIS_CONTROL_FREQUENCE 1000.0f
 
 //底盘前后左右控制按键
 #define CHASSIS_FRONT_KEY		KEY_PRESSED_OFFSET_W
@@ -136,7 +134,7 @@ typedef struct
 
 typedef struct
 {
-	fp32 now[4], last[4], initial[4];
+	fp32 now[4], initial[4];
 }	wheel_angle_offset_t;
 
 typedef struct
@@ -150,10 +148,8 @@ typedef struct
 	pid_type_def chas_3508_pid[4];         			//底盘3508电机速度pid
 	pid_type_def chas_6020_angle_pid[4];        //底盘6020电机角度pid
 	pid_type_def chas_6020_speed_pid[4];        //底盘6020电机角度pid
-	chassis_mode_e wheel_last_mode;  // Previous mode used by steering angle hold.
-	
-	first_order_filter_type_t chassis_cmd_slow_set_vx;  	//使用一阶低通滤波减缓设定值
-	first_order_filter_type_t chassis_cmd_slow_set_vy;  	//使用一阶低通滤波减缓设定值
+	chassis_soft_turn_t soft_turn;
+	chassis_twist_t raw_target;
 	
 	fp32 vx;                          //底盘速度 前进方向 前为正，单位 m/s
 	fp32 vy;                          //底盘速度 左右方向 左为正  单位 m/s
@@ -161,9 +157,6 @@ typedef struct
 	fp32 vx_set;											//底盘设定速度 前进方向 前为正，单位 m/s
 	fp32 vy_set;											//底盘设定速度 左右方向 左为正，单位 m/s
 	fp32 wz_set;											//底盘设定旋转角速度，逆时针为正，单位 rad/s
-	fp32 last_vx_set;									//底盘上一次前后速度
-	fp32 last_vy_set;									//底盘上一次左右速度
-	fp32 last_wz_set;									//底盘上一次旋转速度
 	fp32 gimbal_radian_of_ecd;				//云台yaw电机反馈的弧度值
 	uint8_t gimbal_behaviour;					//云台当前行为模式
 	uint8_t gimbal_shoot_mode;				//云台当前射击模式

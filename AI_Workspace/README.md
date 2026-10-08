@@ -4,6 +4,7 @@
 
 ## 当前资料
 
+- [软转向实施与验证](reports/软转向实施与验证.md)：本分支控制实现、参数、验证证据及待执行的实车验收入口。
 - [工程结构优化实施方案](reports/工程结构优化实施方案.md)
 - [工程结构优化执行记录](reports/工程结构优化执行记录.md)
 - [第一批代码简化结果](reports/simplification/batch-01.md)
@@ -30,6 +31,8 @@ Git 中的索引与报告不能替代本地恢复 ZIP。恢复时使用阶段包
 - `snapshots/after-batch-01/`：第一批删减及修复后的构建证据。
 - `snapshots/before-structure-01/`：结构整理前最新工作区、构建证据、原始工具和文档备份。
 - `snapshots/after-structure-01/`：结构整理后的阶段包，完成验收后生成。
+- `snapshots/before-soft-turn-01/`：软转向实施前两端源码、固件及编译基线。
+- `snapshots/after-soft-turn-02/`：软转向最终实现及 USART6 调试发送收尾修复后的阶段包。
 
 原阶段包内记录的旧路径是历史来源。当前存放位置见 `artifacts/structure-01/migration-manifest.json`；迁移时已核对文件哈希。
 

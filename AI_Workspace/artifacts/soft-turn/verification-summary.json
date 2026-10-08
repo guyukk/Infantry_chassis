@@ -1,0 +1,60 @@
+{
+  "passed": true,
+  "branch": "soft_turn",
+  "firmware_snapshot": "AI_Workspace\\snapshots\\after-soft-turn-02",
+  "source_hashes_match_tests": true,
+  "gimbal_sources_unchanged": true,
+  "warning_comparison": {
+    "chassis": {
+      "baseline_warnings": 0,
+      "final_warnings": 0,
+      "added_warnings": 0,
+      "removed_warnings": 0
+    },
+    "gimbal": {
+      "baseline_warnings": 40,
+      "final_warnings": 40,
+      "added_warnings": 0,
+      "removed_warnings": 0
+    }
+  },
+  "build_metrics": {
+    "chassis": {
+      "success": true,
+      "errors": 0,
+      "warnings": 0,
+      "code_bytes": 81212,
+      "ro_data_bytes": 4648,
+      "rw_data_bytes": 976,
+      "zi_data_bytes": 59544,
+      "image_sha256": "0ebc1814e380b69bf79bbe24c3cd42572663e3da1858bf107715aeb536814f82",
+      "warning_codes": {}
+    },
+    "gimbal": {
+      "success": true,
+      "errors": 0,
+      "warnings": 40,
+      "code_bytes": 111712,
+      "ro_data_bytes": 4196,
+      "rw_data_bytes": 1152,
+      "zi_data_bytes": 58672,
+      "image_sha256": "258eb64a140c1042fe268f2d943fad58b958aa8f945742f103fe983106700864",
+      "warning_codes": {
+        "1-D": 2,
+        "120-D": 1,
+        "177-D": 8,
+        "185-D": 1,
+        "223-D": 2,
+        "3108-D": 24,
+        "550-D": 2
+      }
+    }
+  },
+  "debug_build_success": true,
+  "soft_turn_checks": 260543,
+  "telemetry_decoder_checks": 3,
+  "board_frame_calibration_checks": 42,
+  "snapshot_integrity": "OK",
+  "hardware_flashing_performed": false,
+  "road_tests": "pending"
+}

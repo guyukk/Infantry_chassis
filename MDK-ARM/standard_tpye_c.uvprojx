@@ -545,6 +545,16 @@
               <FilePath>..\application\chassis_task.c</FilePath>
             </File>
             <File>
+              <FileName>chassis_soft_turn.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\application\chassis_soft_turn.c</FilePath>
+            </File>
+            <File>
+              <FileName>chassis_soft_turn_log.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\application\chassis_soft_turn_log.c</FilePath>
+            </File>
+            <File>
               <FileName>INS_task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\application\INS_task.c</FilePath>

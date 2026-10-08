@@ -66,7 +66,7 @@ void chassis_behaviour_mode_set(chassis_move_t *chassis_move_mode)
 	}
 	
 	
-	/* 遥控器在下档，根据键盘x、c、shift来改变模式，每2个毫秒刷新一次，所以要一直按着才能保证模式正确 */
+	/* 下档时按住 x/c/shift 选择模式；每个控制周期更新。 */
 	if (switch_is_down(chassis_move_mode->chassis_RC->rc.s[CHASSIS_MODE_CHANNEL]) && (chassis_move_mode->chassis_RC->key.v & CHASSIS_STOP_KEYBOARD))
 	{
 		chassis_behaviour_mode = CHASSIS_NO_MOVE;		//x键 静止模式
