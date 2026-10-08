@@ -435,62 +435,6 @@
               <FilePath>../Src/i2c.c</FilePath>
             </File>
             <File>
-              <FileName>iwdg.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Src/iwdg.c</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>1</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>0</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>0</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <uC99>2</uC99>
-                    <uGnu>2</uGnu>
-                    <useXO>2</useXO>
-                    <v6Lang>0</v6Lang>
-                    <v6LangP>0</v6LangP>
-                    <vShortEn>2</vShortEn>
-                    <vShortWch>2</vShortWch>
-                    <v6Lto>2</v6Lto>
-                    <v6WtE>2</v6WtE>
-                    <v6Rtti>2</v6Rtti>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
-            </File>
-            <File>
               <FileName>rng.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/rng.c</FilePath>
@@ -576,11 +520,6 @@
           <GroupName>applications</GroupName>
           <Files>
             <File>
-              <FileName>auto_aim.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\application\auto_aim.c</FilePath>
-            </File>
-            <File>
               <FileName>calibrate_task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\application\calibrate_task.c</FilePath>
@@ -601,29 +540,9 @@
               <FilePath>..\application\chassis_behaviour.c</FilePath>
             </File>
             <File>
-              <FileName>chassis_power_control.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\application\chassis_power_control.c</FilePath>
-            </File>
-            <File>
               <FileName>chassis_task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\application\chassis_task.c</FilePath>
-            </File>
-            <File>
-              <FileName>gimbal_behaviour.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\application\gimbal_behaviour.c</FilePath>
-            </File>
-            <File>
-              <FileName>gimbal_task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\application\gimbal_task.c</FilePath>
-            </File>
-            <File>
-              <FileName>idle.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\application\idle.c</FilePath>
             </File>
             <File>
               <FileName>INS_task.c</FileName>
@@ -676,16 +595,6 @@
               <FilePath>..\application\servo_task.c</FilePath>
             </File>
             <File>
-              <FileName>shoot.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\application\shoot.c</FilePath>
-            </File>
-            <File>
-              <FileName>slip_control.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\application\slip_control.c</FilePath>
-            </File>
-            <File>
               <FileName>video_transmission_module.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\application\video_transmission_module.c</FilePath>
@@ -736,11 +645,6 @@
               <FilePath>..\bsp\boards\bsp_flash.c</FilePath>
             </File>
             <File>
-              <FileName>bsp_fric.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\bsp\boards\bsp_fric.c</FilePath>
-            </File>
-            <File>
               <FileName>bsp_imu_pwm.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\bsp\boards\bsp_imu_pwm.c</FilePath>
@@ -749,11 +653,6 @@
               <FileName>bsp_i2c.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\bsp\boards\bsp_i2c.c</FilePath>
-            </File>
-            <File>
-              <FileName>bsp_laser.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\bsp\boards\bsp_laser.c</FilePath>
             </File>
             <File>
               <FileName>bsp_led.c</FileName>
@@ -2611,11 +2510,6 @@
           <GroupName>devices</GroupName>
           <Files>
             <File>
-              <FileName>OLED.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\components\devices\OLED.c</FilePath>
-            </File>
-            <File>
               <FileName>BMI088driver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\components\devices\BMI088driver.c</FilePath>
@@ -3581,21 +3475,6 @@
               <FileName>fifo.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\components\support\fifo.c</FilePath>
-            </File>
-            <File>
-              <FileName>mem_mang4.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\components\support\mem_mang4.c</FilePath>
-            </File>
-            <File>
-              <FileName>GRAVITY.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\components\support\GRAVITY.c</FilePath>
-            </File>
-            <File>
-              <FileName>kalman_filter.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\components\support\kalman_filter.c</FilePath>
             </File>
           </Files>
         </Group>

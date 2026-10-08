@@ -1,0 +1,45 @@
+--- before
++++ after
+@@ -1,8 +1,5 @@
+ {
+     uint8_t chassis_mode_index = 0;
+-    uint8_t shoot_mode_index = 0;
+-    uint8_t gimbal_mode_index = 0;
+-    uint8_t aim_mode_index = 0;
+ 
+     super_cap_volt = (int32_t)pm01_od.v_out;
+     ui_self_id = get_robot_id();
+@@ -17,29 +14,11 @@
+         chassis_mode_index = (uint8_t)chassis_move.chassis_mode;
+     }
+ 		
+-    if (gimbal_behaviour <= GIMBAL_SPIN)
+-    {
+-        if (gimbal_behaviour == GIMBAL_SPIN)
+-        {
+-            gimbal_mode_index = 2;
+-        }
+-        else if (gimbal_behaviour == GIMBAL_ABSOLUTE_ANGLE ||                  gimbal_behaviour == GIMBAL_RELATIVE_ANGLE)
+-
+-        {
+-            gimbal_mode_index = 1;
+-        }
+-        else
+-        {
+-            gimbal_mode_index = 0;
+-        }
+-    }
+-
+-    aim_mode_index = auto_aim_flag ? 0 : 1;
+-
+     strcpy(((ui_interface_string_t*)&(ui_g_now_strings[0]))->string, chassis_mode[chassis_mode_index]);
+-    strcpy(((ui_interface_string_t*)&(ui_g_now_strings[1]))->string, shoot_mode[shoot_mode_index]);
+-    strcpy(((ui_interface_string_t*)&(ui_g_now_strings[2]))->string, gimbal_mode[gimbal_mode_index]);
+-    strcpy(((ui_interface_string_t*)&(ui_g_now_strings[3]))->string, aim_mode[aim_mode_index]);
++    
++    strcpy(((ui_interface_string_t*)&(ui_g_now_strings[1]))->string, " OFF ");
++    strcpy(((ui_interface_string_t*)&(ui_g_now_strings[2]))->string, " NAN ");
++    strcpy(((ui_interface_string_t*)&(ui_g_now_strings[3]))->string, "OFF");
+ 
+     uint8_t super_cap_percent = 0;
+     if (super_cap_volt >= 2000 && super_cap_volt <= 2600)

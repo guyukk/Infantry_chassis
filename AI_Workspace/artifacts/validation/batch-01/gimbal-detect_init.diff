@@ -1,0 +1,11 @@
+--- before
++++ after
+@@ -39,7 +39,7 @@
+     }
+ 
+     error_list[OLED_TOE].data_is_error_fun = 0;
+-    error_list[OLED_TOE].solve_lost_fun = OLED_com_reset;
++    error_list[OLED_TOE].solve_lost_fun = 0;
+     error_list[OLED_TOE].solve_data_error_fun = 0;
+ 
+ 

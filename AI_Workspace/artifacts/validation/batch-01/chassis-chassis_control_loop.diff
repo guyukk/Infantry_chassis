@@ -1,0 +1,19 @@
+--- before
++++ after
+@@ -37,11 +37,14 @@
+ 	}
+ 	
+ 
+-
+ 	
+ 	
+ 	PID_Calc_Jump(chassis_move_control_loop);
+ 	
+ 	
+-	chassis_power_control(chassis_move_control_loop);
++	for (uint8_t i = 0; i < 4; i++)
++	{
++		chassis_move_control_loop->chassis_3508[i].give_current = (int16_t)chassis_move_control_loop->chas_3508_pid[i].out;
++		chassis_move_control_loop->chassis_6020[i].give_current = (int16_t)chassis_move_control_loop->chas_6020_speed_pid[i].out;
++	}
+ }

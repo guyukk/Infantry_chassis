@@ -1,0 +1,32 @@
+--- before
++++ after
+@@ -1,7 +1,5 @@
+ {
+-	
+ 	vTaskDelay(357);	
+-	
+ 	chassis_init(&chassis_move); 
+ 	
+ 	
+@@ -14,13 +12,10 @@
+ 
+  
+ 	while (1)
+-	
+-	while (1)
+ 	{
+ 		
+ 		chassis_set_mode(&chassis_move);
+ 		
+-		chassis_mode_change_control_transit(&chassis_move);
+ 		
+ 		chassis_feedback_update(&chassis_move);
+ 		
+@@ -42,7 +37,6 @@
+ 			CAN_cmd_CHAS_3508(chassis_move.chassis_3508[0].give_current,chassis_move.chassis_3508[1].give_current,
+ 												chassis_move.chassis_3508[2].give_current,chassis_move.chassis_3508[3].give_current);
+ 			
+-			HAL_IWDG_Refresh(&hiwdg);
+ 		}
+ 		
+ 		

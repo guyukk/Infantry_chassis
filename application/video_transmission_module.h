@@ -69,6 +69,9 @@ typedef struct
 } VTM_Data_t;
 #pragma pack()
 
+// The inter-board frame carries this packed layout without the two header bytes.
+typedef char vtm_board_layout_size_check[(sizeof(VTM_Data_t) == 21U) ? 1 : -1];
+
 // 全局遥控数据结构体(外部可调用)
 extern VTM_Data_t vtm_data;
 

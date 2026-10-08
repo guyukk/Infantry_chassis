@@ -1,0 +1,52 @@
+--- before
++++ after
+@@ -7,37 +7,7 @@
+ 	chassis_behaviour_control_set(&vx_set, &vy_set, &wz_set, chassis_move_control);
+ 	wz_set = - wz_set;
+ 	
+-	if (chassis_move_control->chassis_mode == CHASSIS_VECTOR_RETURN) 
+-	{
+-		
+-		 
+-		
+-		
+-		chassis_move_control->wz_set = -chassis_move_control->return_wz_set * 0.00006f;  
+-		
+-		if (fabs(chassis_move_control->wz_set) < 0.001f && chassis_move_control->chassis_return_record == CHASSIS_VECTOR_RETURN)  
+-		{
+-			chassis_move_control->wz_set = 0;
+-			chassis_move_control->chassis_return_flag = 0;  
+-			
+-		 
+-		
+-		}
+-		
+-		
+-		fp32 vector[2] = {vx_set, vy_set};
+-		
+-		
+-		vector_rotate(chassis_move_control->gimbal_radian_of_ecd + (0.00f), vector);
+-		
+-		vx_set = vector[0];
+-		vy_set = vector[1];
+-		
+-		
+-		chassis_move_control->vx_set = fp32_constrain(vx_set, chassis_move_control->vx_min_speed, chassis_move_control->vx_max_speed);
+-		chassis_move_control->vy_set = fp32_constrain(vy_set, chassis_move_control->vy_min_speed, chassis_move_control->vy_max_speed);
+-	}
+-	else if (chassis_move_control->chassis_mode == CHASSIS_VECTOR_NO_MOVE)
++	if (chassis_move_control->chassis_mode == CHASSIS_VECTOR_NO_MOVE)
+ 	{
+ 		chassis_move_control->vx_set = vx_set = 0.0f;
+ 		chassis_move_control->vy_set = vy_set = 0.0f;
+@@ -67,10 +37,6 @@
+ 		
+ 		chassis_move_control->wz_set = wz_set;
+ 		
+-		if (chassis_move_control->chassis_mode == CHASSIS_VECTOR_RETURN)  
+-		{
+-			chassis_move_control->wz_set = 0;
+-		}
+ 		
+ 		fp32 vector[2] = {vx_set, vy_set};
+ 		

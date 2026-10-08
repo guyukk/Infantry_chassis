@@ -17,13 +17,9 @@
 #include "cmsis_os.h"
 #include "stdio.h"
 #include "chassis_task.h"
-#include "gimbal_task.h"
-#include "shoot.h"
-#include "auto_aim.h"
 #include "referee.h"
 #include "protocol.h"
 #include "pm01_api.h"
-#include "gimbal_behaviour.h"
 
 #include "ui_g.h"
 
@@ -31,12 +27,10 @@ extern volatile pm01_od_t pm01_od;
 extern robot_status_t robot_status;
 
 #define UI_TIME    100
+#define UI_REFRESH_RC_CHANNEL 1
 
-const char aim_mode[2][4] = {" ON", "OFF"};
 
-const char shoot_mode[7][6] = {" OFF ", "FRICT", "READY", "READY", "BURST", "AUTO ", "DONE "};
 
-const char gimbal_mode[3][6] = {" NAN ", "REAL ", "SPIN "};
 
 const char chassis_mode[4][6] = {" NAN ", "REAL ", "C_YAW", "SPIN "};
 
@@ -90,7 +84,7 @@ void UI_init(void)
  *******************************************************************************/
 void UI_set(void)
 {
-    if (switch_is_down(chassis_move.chassis_RC->rc.s[SHOOT_RC_MODE_CHANNEL]))
+    if (switch_is_down(chassis_move.chassis_RC->rc.s[UI_REFRESH_RC_CHANNEL]))
     {
         ui_self_id = get_robot_id();
         if (ui_self_id != 0)
@@ -110,9 +104,6 @@ void UI_set(void)
 void UI_update(void)
 {
     uint8_t chassis_mode_index = 0;
-    uint8_t shoot_mode_index = 0;
-    uint8_t gimbal_mode_index = 0;
-    uint8_t aim_mode_index = 0;
 
     super_cap_volt = (int32_t)pm01_od.v_out;
     ui_self_id = get_robot_id();
@@ -127,29 +118,11 @@ void UI_update(void)
         chassis_mode_index = (uint8_t)chassis_move.chassis_mode;
     }
 		
-    if (gimbal_behaviour <= GIMBAL_SPIN)
-    {
-        if (gimbal_behaviour == GIMBAL_SPIN)
-        {
-            gimbal_mode_index = 2;
-        }
-        else if (gimbal_behaviour == GIMBAL_ABSOLUTE_ANGLE || \
-                 gimbal_behaviour == GIMBAL_RELATIVE_ANGLE)
-        {
-            gimbal_mode_index = 1;
-        }
-        else
-        {
-            gimbal_mode_index = 0;
-        }
-    }
-
-    aim_mode_index = auto_aim_flag ? 0 : 1;
-
     strcpy(ui_g_Ungroup_chassis_dis->string, chassis_mode[chassis_mode_index]);
-    strcpy(ui_g_Ungroup_friction_mode->string, shoot_mode[shoot_mode_index]);
-    strcpy(ui_g_Ungroup_gimbal_dis->string, gimbal_mode[gimbal_mode_index]);
-    strcpy(ui_g_Ungroup_aim_dis->string, aim_mode[aim_mode_index]);
+    // Preserve the existing placeholders until received status is mapped explicitly.
+    strcpy(ui_g_Ungroup_friction_mode->string, " OFF ");
+    strcpy(ui_g_Ungroup_gimbal_dis->string, " NAN ");
+    strcpy(ui_g_Ungroup_aim_dis->string, "OFF");
 
     uint8_t super_cap_percent = 0;
     if (super_cap_volt >= 2000 && super_cap_volt <= 2600)

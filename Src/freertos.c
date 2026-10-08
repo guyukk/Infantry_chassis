@@ -27,7 +27,6 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
-#include "calibrate_task.h"
 #include "chassis_task.h"
 #include "INS_task.h"
 #include "led_flow_task.h"
@@ -35,21 +34,18 @@
 #include "remote_control.h"
 #include "servo_task.h"
 #include "message_task.h"
-#include "idle.h"
 #include "UI.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
-osThreadId calibrate_tast_handle;
 osThreadId chassisTaskHandle;
 osThreadId imuTaskHandle;
 osThreadId led_RGB_flow_handle;
 osThreadId referee_usart_task_handle;
 osThreadId servo_task_handle;
 osThreadId message_task_handle;
-osThreadId idle_task_handle;
 osThreadId UI_task_handle;
 
 /* USER CODE END PTD */
@@ -156,8 +152,6 @@ void MX_FREERTOS_Init(void) {
 	osThreadDef(SERVO, servo_task, osPriorityNormal, 0, 128);
 	servo_task_handle = osThreadCreate(osThread(SERVO), NULL);
 	
-	osThreadDef(IDLE, idle_task, osPriorityNormal, 0, 64);
-	idle_task_handle = osThreadCreate(osThread(IDLE), NULL);
 
 	osThreadDef(UI, UI_task, osPriorityNormal, 0, 512);
 	UI_task_handle = osThreadCreate(osThread(UI), NULL);

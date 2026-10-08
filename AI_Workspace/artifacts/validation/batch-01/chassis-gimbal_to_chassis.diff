@@ -1,0 +1,33 @@
+--- before
++++ after
+@@ -50,27 +50,9 @@
+ 	chassis_move.gimbal_shoot_mode = gimbal_shoot_mode_now;
+ 	
+ 	uint8_t* vtm_data_ptr = (uint8_t*)&vtm_data;
+-	for(uint8_t i = 0; i <= 25; i ++)
++	
++	for(uint8_t i = 0; i < sizeof(vtm_data) - 2U; i ++)
+ 	{
+ 		vtm_data_ptr[2 + i] = gimbal_data[19 + i];
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-}
++	}
+ }

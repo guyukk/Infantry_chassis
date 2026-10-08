@@ -25,7 +25,6 @@
 #include "crc.h"
 #include "dma.h"
 #include "i2c.h"
-#include "iwdg.h"
 #include "rng.h"
 #include "rtc.h"
 #include "spi.h"
@@ -41,7 +40,6 @@
 #include "bsp_usart.h"
 #include "calibrate_task.h"
 #include "chassis_task.h"
-#include "gimbal_task.h"
 #include "INS_task.h"
 #include "led_flow_task.h"
 #include "referee.h"
@@ -135,7 +133,6 @@ int main(void)
   MX_TIM10_Init();
   MX_USART1_UART_Init();
   MX_USART6_UART_Init();
-//  MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
 	can_filter_init();
 	delay_init();
@@ -145,7 +142,6 @@ int main(void)
 	usart1_init();
 	usart1_receive();
 	
-//	HAL_IWDG_Refresh(&hiwdg);
 	usart1_tx_dma_init();
 	
 	vtm_data_init();

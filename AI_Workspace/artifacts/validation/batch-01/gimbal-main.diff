@@ -1,0 +1,11 @@
+--- before
++++ after
+@@ -71,8 +71,6 @@
+ 	HAL_ADCEx_Calibration_Start(&hadc1, (((0x00000000UL))), (( (0x7FFUL << (0U)))));
+ 	HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_val,2);
+ 	HAL_ADC_Start(&hadc3);
+-	
+-	fifo_s_init(&referee_fifo, referee_fifo_buf, 1024);
+ 	proto_init_from_main();
+ 	
+    

@@ -1,0 +1,8 @@
+{
+  "status": "0x600d",
+  "checks": 42,
+  "failure": 0,
+  "compiler": "ARMCC 5.06",
+  "emulator": "Unicorn Cortex-M/Thumb",
+  "passed": true
+}

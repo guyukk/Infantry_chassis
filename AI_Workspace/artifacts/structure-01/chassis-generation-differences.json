@@ -1,0 +1,7 @@
+[
+  {
+    "file": "Src/main.c",
+    "function": "SystemClock_Config",
+    "diff": "--- before:SystemClock_Config\n+++ generated:SystemClock_Config\n@@ -10,9 +10,8 @@\n   \r\n \r\n  \r\n-  RCC_OscInitStruct.OscillatorType = 0x00000008U|0x00000001U;\r\n+  RCC_OscInitStruct.OscillatorType = 0x00000001U;\r\n   RCC_OscInitStruct.HSEState = (0x1UL << (16U));\r\n-  RCC_OscInitStruct.LSIState = ((uint8_t)0x01);\r\n   RCC_OscInitStruct.PLL.PLLState = ((uint8_t)0x02);\r\n   RCC_OscInitStruct.PLL.PLLSource = (0x1UL << (22U));\r\n   RCC_OscInitStruct.PLL.PLLM = 6;\r\n"
+  }
+]

@@ -25,3 +25,8 @@ user-invocable: true
 
 ## 输出
 先给结论和改动摘要，再列关键文件及处理依据，最后报告构建或检查结果。疑似冗余但证据不足的项目单独列出，不将其混入已完成清理项。
+
+## 维护资料入口
+
+- 当前 AI 资料统一位于 `AI_Workspace/`，先查阅 `AI_Workspace/README.md`。
+- 编译、快照与验证工具位于 `AI_Workspace/tools/`；恢复阶段包位于 `AI_Workspace/snapshots/`。

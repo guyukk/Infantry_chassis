@@ -30,8 +30,6 @@
 #define GIMBAL_YAW_RADIAN_REVERSE 1
 
 /* 底盘回正、跟随云台和小陀螺模式的角度偏移。 */
-#define CHASSIS_RETURN_TARGET (-3.13f)
-#define CHASSIS_RETURN_OFFSET (0.00f)
 #define CHASSIS_FOLLOW_GIMBAL_YAW_OFFSET (0.00f)
 #define CHASSIS_SPIN_OFFSET (0.50f)
 

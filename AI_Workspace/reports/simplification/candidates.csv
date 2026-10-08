@@ -1,0 +1,21 @@
+id,board,batch,scope,status,reason,prerequisite
+G01,gimbal,1,User/ROBOT/Hero.h;Balance.h;Sentinel.h;Engineer.h,other_configuration,Current ROBOT_TYPE is Infantry_robot,Remove inactive includes and any out-of-guard references
+G02,gimbal,1,User/chassis/Mecanum_chassis.*;Omni_chassis.*;Balance_chassis.*,other_configuration,Current chassis selection is Steering_wheel,Preserve required shared types and remove Keil entries
+G03,gimbal,1,User/gimbal/yaw_pitch_linkage.*;double_yaw_pitch.*;Multi-axis_robotic_arm.*,other_configuration,Current gimbal selection is yaw_pitch_direct,Audit includes outside guards and shared symbol declarations
+G04,gimbal,1,User/shoot/shoot_double.*;shoot_none.*,other_configuration,Current friction selection is friction_3508,Retain active shoot_3508 implementation and parameters
+G05,gimbal,1,User/APP/*_backup.h;User/chassis/steering_chassis_backup.*,not_in_keil,Backup C unit is absent from Keil list,Remove stale includes only after reviewing includes index
+G06,gimbal,1,User/APP/test_task.*;usb_task.*;idle.*;led_flow_task.*;servo_task.*,not_in_keil,These C units are absent from Keil list,Verify no remaining header-only definitions or consumers
+G07,gimbal,1,User/profiler/task_profiler_sampling.*;User/Devices/DM_Motor/dm4310_drv.*,not_in_keil,Separate legacy implementations are absent from Keil list,Remove unused profiler include; preserve active DM APIs in can_bsp.c
+G08,gimbal,1,USB_DEVICE/App/usb_common.c;User/Communication/core/CRC8_CRC16.c,not_in_keil,Alternative C units are absent from Keil list,Keep usb_common.h consumers and active CRC implementation
+G09,gimbal,2,User/APP/chassis*;User/chassis/steering_chassis.*;User/APP/observer.*;oled_task.*;User/ui,requires_decoupling,Tasks inactive but steering code and globals remain linked,Separate received chassis state and shared types before deletion
+G10,gimbal,2,User/Algorithm/EKF;kalman;VMC,requires_decoupling,INS task uses Mahony but headers still reference alternative algorithms,Remove type and include dependencies after deleting obsolete consumers
+C01,chassis,1,application/INA226.*,not_in_keil,INA226.c is absent from Keil list,Verify no remaining consumers
+C02,chassis,2,application/slip_control.*;components/support/kalman_filter.*,requires_decoupling,slip_control call is commented out,Remove included headers and any shared data dependencies
+C03,chassis,2,application/gimbal_task.*;gimbal_behaviour.*;shoot.*;auto_aim.*,requires_decoupling,Tasks inactive but calibration getters and UI globals remain linked,Preserve protocol enums and calibration persistence semantics
+C04,chassis,3,application/idle.*,active_task_candidate,Busy loop at Normal priority with no business reader of idleTime,Remove task creation and measure scheduling impact
+C05,chassis,3,application/chassis_power_control.*;pm01_api.*,partial_cleanup,Power predictor inactive but PM01 callback and UI voltage remain active,Retain PID current assignment and isolate telemetry before PM01 removal
+C06,chassis,3,CHASSIS_VECTOR_RETURN branches and state,unreachable_input_candidate,Mode selection entry is commented out,Preserve enum wire values and confirm no hidden writers
+C07,chassis,4,USB CDC stack,active_initialization_candidate,Receive callback only rearms with no observed application consumer,Confirm required USB behavior then remove IRQ HAL MSP and middleware together
+C08,chassis,4,servo_task;LED task;extra peripheral init,hardware_dependent,Tasks or outputs are active,Determine actual auxiliary outputs before removing hardware setup
+G11,gimbal,separate,detect_task and toe_is_error consumers,existing_issue,Detection task not created while checks remain,Resolve intended fault behavior separately from pure deletion
+G12,gimbal,separate,USART1 parser and warning sites,existing_issue,Parser bounds and existing build warnings need independent review,Keep baseline behavior during structural simplification

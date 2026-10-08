@@ -1,0 +1,40 @@
+--- before
++++ after
+@@ -8,9 +8,7 @@
+ 	
+ 	const static fp32 chas_6020_speed_pid_param[3] = {85.0f, 0.0f, 80.0f};
+ 	
+-	const static fp32 chassis_yaw_pid_param[3] = {0.08f, 0.002f, 0.0f};
+ 	
+-	const static fp32 chassis_yaw_return_pid_param[3] = {800.0f, 0.08f, 20.0f};
+ 	
+ 	
+ 	chassis_move_init->chassis_mode = CHASSIS_VECTOR_NO_MOVE;
+@@ -19,8 +17,6 @@
+ 	
+ 	chassis_move_init->chassis_INS_angle = get_INS_angle_point();
+ 	
+-	chassis_move_init->chassis_yaw_motor = get_yaw_motor_point();
+-	chassis_move_init->chassis_pitch_motor = get_pitch_motor_point();
+ 	
+ 	
+ 	for(uint8_t i = 0; i < 4; i++)
+@@ -32,10 +28,8 @@
+ 		PID_init(&chassis_move_init->chas_6020_speed_pid[i], PID_USUAL, chas_6020_speed_pid_param, 16000.0f, 0.0f);
+ 	}
+ 	
+-	PID_init(&chassis_move_init->chas_return_pid, PID_USUAL, chassis_yaw_return_pid_param, 600.0f, 60.0f);
+ 	
+ 	
+-	PID_init(&chassis_move_init->chassis_angle_pid, PID_USUAL, chassis_yaw_pid_param, 0.08f, 0.005f);
+ 	
+ 	
+ 	const static fp32 chassis_x_order_filter = 0.1666666667f;
+@@ -53,7 +47,6 @@
+ 	chassis_wheel_angle_offset_init();
+ 	
+ 	
+-	chassis_move_init->chassis_return_flag = 1;
+ 	
+ 	
+ 	chassis_feedback_update(chassis_move_init);

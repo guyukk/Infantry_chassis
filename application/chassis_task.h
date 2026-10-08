@@ -23,7 +23,6 @@
 
 #include "struct_typedef.h"
 #include "CAN_receive.h"
-#include "gimbal_task.h"
 #include "pid.h"
 #include "remote_control.h"
 #include "user_lib.h"
@@ -88,11 +87,6 @@
 
 
 //YAW回正模式PID
-#define YAW_RETURN_PID_KP 				800.0f
-#define YAW_RETURN_PID_KI 				0.08f
-#define YAW_RETURN_PID_KD					20.0f
-#define YAW_RETURN_PID_MAX_OUT 		600.0f
-#define YAW_RETURN_PID_MAX_IOUT		60.0f
 
 //yaw 速度环 PID参数以及 PID最大输出，积分输出
 #define GM6020_MOTOR_SPEED_PID_KP        85.0f
@@ -102,11 +96,6 @@
 #define GM6020_MOTOR_SPEED_PID_MAX_IOUT  0.0f
 
 /* 底盘旋转跟随PID */	/***************待定***************/
-#define CHASSIS_FOLLOW_GIMBAL_PID_KP					0.08f
-#define CHASSIS_FOLLOW_GIMBAL_PID_KI					0.002f
-#define CHASSIS_FOLLOW_GIMBAL_PID_KD					0.0f
-#define CHASSIS_FOLLOW_GIMBAL_PID_MAX_OUT			0.08f
-#define CHASSIS_FOLLOW_GIMBAL_PID_MAX_IOUT		0.005f
 
 
 #ifndef myabs
@@ -129,9 +118,8 @@
 typedef enum
 {
 	CHASSIS_VECTOR_NO_MOVE = 0,					//底盘不动
-  CHASSIS_VECTOR_FOLLOW_GIMBAL_YAW,   //底盘会跟随云台相对角度
-  CHASSIS_VECTOR_SPIN,								//底盘有旋转速度控制
-	CHASSIS_VECTOR_RETURN  							//底盘回正
+  CHASSIS_VECTOR_FOLLOW_GIMBAL_YAW = 1,   //底盘会跟随云台相对角度
+  CHASSIS_VECTOR_SPIN = 2,								//底盘有旋转速度控制
 } chassis_mode_e;
 
 typedef struct
@@ -154,21 +142,15 @@ typedef struct
 typedef struct
 {
 	const RC_ctrl_t *chassis_RC;              	//底盘使用的遥控器指针
-	const gimbal_motor_t *chassis_yaw_motor;  	//底盘使用到yaw云台电机的相对角度来计算底盘的欧拉角.
-	const gimbal_motor_t *chassis_pitch_motor;	//底盘使用到pitch云台电机的相对角度来计算底盘的欧拉角
 	const fp32 *chassis_INS_angle;            	//取陀螺仪解算出的欧拉角指针
 	chassis_mode_e chassis_mode;              	//底盘控制状态机
-	chassis_mode_e last_chassis_mode;         	//底盘上次控制状态机
 	chassis_motor_t chassis_3508[4];						//底盘3508电机数据
 	chassis_motor_t chassis_6020[4];						//底盘6020电机数据
 	wheel_angle_offset_t wheel_angle_offset;		//底盘6020电机角度偏移
 	pid_type_def chas_3508_pid[4];         			//底盘3508电机速度pid
 	pid_type_def chas_6020_angle_pid[4];        //底盘6020电机角度pid
 	pid_type_def chas_6020_speed_pid[4];        //底盘6020电机角度pid
-	pid_type_def chassis_angle_pid;           	//底盘跟随角度pid
-	pid_type_def chas_return_pid;        				//底盘回正模式pid
-	uint8_t chassis_return_flag;								//底盘回正标志
-	chassis_mode_e chassis_return_record;				//底盘回正记录
+	chassis_mode_e wheel_last_mode;  // Previous mode used by steering angle hold.
 	
 	first_order_filter_type_t chassis_cmd_slow_set_vx;  	//使用一阶低通滤波减缓设定值
 	first_order_filter_type_t chassis_cmd_slow_set_vy;  	//使用一阶低通滤波减缓设定值
@@ -182,9 +164,6 @@ typedef struct
 	fp32 last_vx_set;									//底盘上一次前后速度
 	fp32 last_vy_set;									//底盘上一次左右速度
 	fp32 last_wz_set;									//底盘上一次旋转速度
-	fp32 return_wz_set;								//底盘回正时设置的角速度，逆时针为正，单位 rad/s
-	fp32 chassis_relative_angle;			//底盘与云台的相对角度，单位 rad
-	fp32 chassis_relative_angle_set;	//底盘相对云台控制角度设置
 	fp32 gimbal_radian_of_ecd;				//云台yaw电机反馈的弧度值
 	uint8_t gimbal_behaviour;					//云台当前行为模式
 	uint8_t gimbal_shoot_mode;				//云台当前射击模式
@@ -205,7 +184,6 @@ extern void chassis_rc_to_control_vector(fp32 *vx_set, fp32 *vy_set, chassis_mov
 
 //底盘运动数据
 extern chassis_move_t chassis_move;
-extern fp32 yaw_set;
 
 
 #endif

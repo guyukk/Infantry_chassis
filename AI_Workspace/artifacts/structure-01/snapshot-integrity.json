@@ -1,0 +1,50 @@
+[
+  {
+    "snapshot": "baseline-2026-10-08",
+    "board": "chassis",
+    "files": 326,
+    "integrity": "OK"
+  },
+  {
+    "snapshot": "baseline-2026-10-08",
+    "board": "gimbal",
+    "files": 1469,
+    "integrity": "OK"
+  },
+  {
+    "snapshot": "before-batch-01",
+    "board": "chassis",
+    "files": 327,
+    "integrity": "OK"
+  },
+  {
+    "snapshot": "before-batch-01",
+    "board": "gimbal",
+    "files": 1469,
+    "integrity": "OK"
+  },
+  {
+    "snapshot": "after-batch-01",
+    "board": "chassis",
+    "files": 294,
+    "integrity": "OK"
+  },
+  {
+    "snapshot": "after-batch-01",
+    "board": "gimbal",
+    "files": 1392,
+    "integrity": "OK"
+  },
+  {
+    "snapshot": "before-structure-01",
+    "board": "chassis",
+    "files": 295,
+    "integrity": "OK"
+  },
+  {
+    "snapshot": "before-structure-01",
+    "board": "gimbal",
+    "files": 1393,
+    "integrity": "OK"
+  }
+]

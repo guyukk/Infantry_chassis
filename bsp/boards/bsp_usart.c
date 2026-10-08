@@ -1,6 +1,6 @@
 #include "bsp_buzzer.h"
 #include "bsp_usart.h"
-#include "chassis_power_control.h"
+#include "chassis_task.h"
 #include "main.h"
 #include "referee_usart_task.h"
 #include "remote_control.h"
@@ -23,8 +23,6 @@ extern const uint8_t RC_TYPE;
 //#define DMA_FLAG_TCIF5 ((uint32_t)0x20000800)
 uint8_t gimbal_data[GIMBAL_DATA_LENGTH] = {0};
 uint8_t usart1_buf[2][USART_BUF_LENGHT];//设置双缓冲区
-uint8_t data_send_from_pc[ USART_BUF_LENGHT/2] = {0};
-uint8_t data_send_from_chassis[ USART_BUF_LENGHT] = {0};
 
 void usart1_init(void)
 {
@@ -277,29 +275,11 @@ void gimbal_to_chassis(uint8_t *gimbal_data)
 	chassis_move.gimbal_shoot_mode = gimbal_shoot_mode_now;
 	
 	uint8_t* vtm_data_ptr = (uint8_t*)&vtm_data;
-	for(uint8_t i = 0; i <= 25; i ++)
+	// Only copy the packed VTM payload; the remaining frame bytes are reserved.
+	for(uint8_t i = 0; i < sizeof(vtm_data) - 2U; i ++)
 	{
 		vtm_data_ptr[2 + i] = gimbal_data[19 + i];
-//	if(chassis_move.chassis_mode == CHASSIS_VECTOR_SPIN)
-//	{
-//		if((last_gimbal_radian_of_ecd - chassis_move.gimbal_radian_of_ecd == 0))
-//		{
-//			if(error_count < 50)
-//			{
-//				error_count ++;
-//			}
-//			else
-//			{
-//				error_count = 0;
-//				usart1_init();
-//				usart1_receive();
-//				usart1_tx_dma_init();
-//			}
-//		}
-//		else{ error_count = 0; }
-//	}
-//	last_gimbal_radian_of_ecd = chassis_move.gimbal_radian_of_ecd;
-}
+	}
 }
 
 /****************** 串口调试 ******************/

@@ -1,0 +1,210 @@
+[
+  {
+    "source": "Project_Maintainer",
+    "destination": "AI_Workspace/reports/history/2026-09-30"
+  },
+  {
+    "source": "preparation/simplification/README.md",
+    "destination": "AI_Workspace/reports/simplification/README.md"
+  },
+  {
+    "source": "preparation/simplification/batch-01.md",
+    "destination": "AI_Workspace/reports/simplification/batch-01.md"
+  },
+  {
+    "source": "preparation/simplification/candidates.csv",
+    "destination": "AI_Workspace/reports/simplification/candidates.csv"
+  },
+  {
+    "source": "preparation/simplification/baseline-2026-10-08",
+    "destination": "AI_Workspace/snapshots/baseline-2026-10-08"
+  },
+  {
+    "source": "preparation/simplification/before-batch-01",
+    "destination": "AI_Workspace/snapshots/before-batch-01"
+  },
+  {
+    "source": "preparation/simplification/after-batch-01",
+    "destination": "AI_Workspace/snapshots/after-batch-01"
+  },
+  {
+    "source": "preparation/simplification/build-20261008-201031",
+    "destination": "AI_Workspace/artifacts/logs/build-20261008-201031"
+  },
+  {
+    "source": "preparation/simplification/build-20261008-201142",
+    "destination": "AI_Workspace/artifacts/logs/build-20261008-201142"
+  },
+  {
+    "source": "preparation/simplification/build-chassis-repair-01",
+    "destination": "AI_Workspace/artifacts/logs/build-chassis-repair-01"
+  },
+  {
+    "source": "preparation/simplification/build-gimbal-repair-01",
+    "destination": "AI_Workspace/artifacts/logs/build-gimbal-repair-01"
+  },
+  {
+    "source": "preparation/simplification/build-validation/change-summary.json",
+    "destination": "AI_Workspace/artifacts/validation/batch-01/change-summary.json"
+  },
+  {
+    "source": "preparation/simplification/build-validation/chassis-cali_param_init.diff",
+    "destination": "AI_Workspace/artifacts/validation/batch-01/chassis-cali_param_init.diff"
+  },
+  {
+    "source": "preparation/simplification/build-validation/chassis-chassis_behaviour_mode_set.diff",
+    "destination": "AI_Workspace/artifacts/validation/batch-01/chassis-chassis_behaviour_mode_set.diff"
+  },
+  {
+    "source": "preparation/simplification/build-validation/chassis-chassis_control_loop.diff",
+    "destination": "AI_Workspace/artifacts/validation/batch-01/chassis-chassis_control_loop.diff"
+  },
+  {
+    "source": "preparation/simplification/build-validation/chassis-chassis_init.diff",
+    "destination": "AI_Workspace/artifacts/validation/batch-01/chassis-chassis_init.diff"
+  },
+  {
+    "source": "preparation/simplification/build-validation/chassis-chassis_set_contorl.diff",
+    "destination": "AI_Workspace/artifacts/validation/batch-01/chassis-chassis_set_contorl.diff"
+  },
+  {
+    "source": "preparation/simplification/build-validation/chassis-chassis_task.diff",
+    "destination": "AI_Workspace/artifacts/validation/batch-01/chassis-chassis_task.diff"
+  },
+  {
+    "source": "preparation/simplification/build-validation/chassis-get_flash_latitude.diff",
+    "destination": "AI_Workspace/artifacts/validation/batch-01/chassis-get_flash_latitude.diff"
+  },
+  {
+    "source": "preparation/simplification/build-validation/chassis-gimbal_to_chassis.diff",
+    "destination": "AI_Workspace/artifacts/validation/batch-01/chassis-gimbal_to_chassis.diff"
+  },
+  {
+    "source": "preparation/simplification/build-validation/chassis-MX_FREERTOS_Init.diff",
+    "destination": "AI_Workspace/artifacts/validation/batch-01/chassis-MX_FREERTOS_Init.diff"
+  },
+  {
+    "source": "preparation/simplification/build-validation/chassis-original",
+    "destination": "AI_Workspace/cache/validation/legacy/chassis-original"
+  },
+  {
+    "source": "preparation/simplification/build-validation/chassis-PID_Calc_Jump.diff",
+    "destination": "AI_Workspace/artifacts/validation/batch-01/chassis-PID_Calc_Jump.diff"
+  },
+  {
+    "source": "preparation/simplification/build-validation/chassis-removed-files.txt",
+    "destination": "AI_Workspace/artifacts/validation/batch-01/chassis-removed-files.txt"
+  },
+  {
+    "source": "preparation/simplification/build-validation/chassis-UI_update.diff",
+    "destination": "AI_Workspace/artifacts/validation/batch-01/chassis-UI_update.diff"
+  },
+  {
+    "source": "preparation/simplification/build-validation/function-comparison.json",
+    "destination": "AI_Workspace/artifacts/validation/batch-01/function-comparison.json"
+  },
+  {
+    "source": "preparation/simplification/build-validation/gimbal-detect_init.diff",
+    "destination": "AI_Workspace/artifacts/validation/batch-01/gimbal-detect_init.diff"
+  },
+  {
+    "source": "preparation/simplification/build-validation/gimbal-INS_task.diff",
+    "destination": "AI_Workspace/artifacts/validation/batch-01/gimbal-INS_task.diff"
+  },
+  {
+    "source": "preparation/simplification/build-validation/gimbal-main.diff",
+    "destination": "AI_Workspace/artifacts/validation/batch-01/gimbal-main.diff"
+  },
+  {
+    "source": "preparation/simplification/build-validation/gimbal-original",
+    "destination": "AI_Workspace/cache/validation/legacy/gimbal-original"
+  },
+  {
+    "source": "preparation/simplification/build-validation/gimbal-removed-files.txt",
+    "destination": "AI_Workspace/artifacts/validation/batch-01/gimbal-removed-files.txt"
+  },
+  {
+    "source": "preparation/simplification/build-validation/gimbal-send_data_to_chassis.diff",
+    "destination": "AI_Workspace/artifacts/validation/batch-01/gimbal-send_data_to_chassis.diff"
+  },
+  {
+    "source": "preparation/simplification/build-validation/gimbal-__attribute__.diff",
+    "destination": "AI_Workspace/artifacts/validation/batch-01/gimbal-__attribute__.diff"
+  },
+  {
+    "source": "preparation/simplification/build-validation/packages",
+    "destination": "AI_Workspace/cache/dependencies/packages"
+  },
+  {
+    "source": "preparation/simplification/build-validation/runtime-check.axf",
+    "destination": "AI_Workspace/artifacts/validation/batch-01/runtime-check.axf"
+  },
+  {
+    "source": "preparation/simplification/build-validation/runtime-check.c",
+    "destination": "AI_Workspace/artifacts/validation/batch-01/runtime-check.c"
+  },
+  {
+    "source": "preparation/simplification/build-validation/runtime-check.o",
+    "destination": "AI_Workspace/cache/validation/legacy/runtime-check.o"
+  },
+  {
+    "source": "preparation/simplification/build-validation/runtime-results.json",
+    "destination": "AI_Workspace/artifacts/validation/batch-01/runtime-results.json"
+  },
+  {
+    "source": "preparation/simplification/build-validation/smoke.axf",
+    "destination": "AI_Workspace/artifacts/validation/batch-01/smoke.axf"
+  },
+  {
+    "source": "preparation/simplification/build-validation/smoke.c",
+    "destination": "AI_Workspace/artifacts/validation/batch-01/smoke.c"
+  },
+  {
+    "source": "preparation/simplification/build-validation/smoke.o",
+    "destination": "AI_Workspace/cache/validation/legacy/smoke.o"
+  },
+  {
+    "source": "preparation/simplification/build-validation/startup.o",
+    "destination": "AI_Workspace/cache/validation/legacy/startup.o"
+  },
+  {
+    "source": "preparation/simplification/build-validation/startup.s",
+    "destination": "AI_Workspace/artifacts/validation/batch-01/startup.s"
+  },
+  {
+    "source": "preparation/simplification/snapshot.py",
+    "destination": "AI_Workspace/artifacts/structure-01/original-tools/snapshot.py"
+  },
+  {
+    "source": "preparation/simplification/audit.py",
+    "destination": "AI_Workspace/artifacts/structure-01/original-tools/audit.py"
+  },
+  {
+    "source": "preparation/simplification/build.ps1",
+    "destination": "AI_Workspace/artifacts/structure-01/original-tools/build.ps1"
+  },
+  {
+    "source": "preparation/simplification/validate_invariants.py",
+    "destination": "AI_Workspace/artifacts/structure-01/original-tools/validate_invariants.py"
+  },
+  {
+    "source": "preparation/simplification/validate_runtime.py",
+    "destination": "AI_Workspace/artifacts/structure-01/original-tools/validate_runtime.py"
+  },
+  {
+    "source": "preparation/simplification/.gitignore",
+    "destination": "AI_Workspace/artifacts/structure-01/legacy-preparation.gitignore"
+  },
+  {
+    "source": "preparation/simplification/__pycache__",
+    "destination": "AI_Workspace/cache/validation/legacy/preparation-pycache"
+  },
+  {
+    "source": "hs_err_pid63984.log",
+    "destination": "AI_Workspace/artifacts/logs/cubemx/hs_err_pid63984.log"
+  },
+  {
+    "source": "replay_pid63984.log",
+    "destination": "AI_Workspace/artifacts/logs/cubemx/replay_pid63984.log"
+  }
+]

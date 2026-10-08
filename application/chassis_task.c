@@ -23,15 +23,12 @@
 #include "CAN_receive.h"
 #include "chassis_behaviour.h"
 #include "chassis_calculate.h"
-#include "chassis_power_control.h"
 #include "chassis_task.h"
 #include "cmsis_os.h"
 #include "INS_task.h"
-#include "iwdg.h"
 #include "pid.h"
 #include "remote_control.h"
 #include "robot_param.h"
-#include "slip_control.h"
 #include "user_lib.h"
 #include <stdbool.h>
 
@@ -88,9 +85,7 @@ static void chassis_init(chassis_move_t *chassis_move_init)
 	//底盘6020速度环pid值
 	const static fp32 chas_6020_speed_pid_param[3] = {GM6020_MOTOR_SPEED_PID_KP, GM6020_MOTOR_SPEED_PID_KI, GM6020_MOTOR_SPEED_PID_KD};
 	//底盘角度pid值
-	const static fp32 chassis_yaw_pid_param[3] = {CHASSIS_FOLLOW_GIMBAL_PID_KP, CHASSIS_FOLLOW_GIMBAL_PID_KI, CHASSIS_FOLLOW_GIMBAL_PID_KD};
 	//回正模式pid值
-	const static fp32 chassis_yaw_return_pid_param[3] = {YAW_RETURN_PID_KP, YAW_RETURN_PID_KI, YAW_RETURN_PID_KD};
 	
 	//底盘开机状态为原始
 	chassis_move_init->chassis_mode = CHASSIS_VECTOR_NO_MOVE;
@@ -99,8 +94,6 @@ static void chassis_init(chassis_move_t *chassis_move_init)
 	//获取陀螺仪姿态角指针
 	chassis_move_init->chassis_INS_angle = get_INS_angle_point();
 	//获取云台电机数据指针
-	chassis_move_init->chassis_yaw_motor = get_yaw_motor_point();
-	chassis_move_init->chassis_pitch_motor = get_pitch_motor_point();
 	
 	//获取底盘电机数据指针，初始化PID 
 	for(uint8_t i = 0; i < 4; i++)
@@ -112,10 +105,8 @@ static void chassis_init(chassis_move_t *chassis_move_init)
 		PID_init(&chassis_move_init->chas_6020_speed_pid[i], PID_USUAL, chas_6020_speed_pid_param, GM6020_MOTOR_SPEED_PID_MAX_OUT, GM6020_MOTOR_SPEED_PID_MAX_IOUT);
 	}
 	//初始化回正模式pid
-	PID_init(&chassis_move_init->chas_return_pid, PID_USUAL, chassis_yaw_return_pid_param, YAW_RETURN_PID_MAX_OUT, YAW_RETURN_PID_MAX_IOUT);
 	
 	//初始化角度PID
-	PID_init(&chassis_move_init->chassis_angle_pid, PID_USUAL, chassis_yaw_pid_param, CHASSIS_FOLLOW_GIMBAL_PID_MAX_OUT, CHASSIS_FOLLOW_GIMBAL_PID_MAX_IOUT);
 	
 	//用一阶滤波代替斜波函数生成
 	const static fp32 chassis_x_order_filter = CHASSIS_ACCEL_X_NUM;
@@ -133,7 +124,6 @@ static void chassis_init(chassis_move_t *chassis_move_init)
 	chassis_wheel_angle_offset_init();
 	
 	//底盘回正标志位初始化为 1
-	chassis_move_init->chassis_return_flag = 1;
 	
 	//更新一下数据
 	chassis_feedback_update(chassis_move_init);
@@ -155,28 +145,7 @@ static void chassis_set_mode(chassis_move_t *chassis_move_mode)
   * @param[out]     chassis_move_transit:"chassis_move"变量指针.
   * @retval         none
   */
-static void chassis_mode_change_control_transit(chassis_move_t *chassis_move_transit)
-{
-	if(chassis_move_transit == NULL) return;
-	
-	//切入跟随云台模式
-	if((chassis_move_transit->last_chassis_mode != CHASSIS_VECTOR_NO_MOVE) && chassis_move_transit->chassis_mode == CHASSIS_VECTOR_NO_MOVE)
-	{
-		chassis_move_transit->chassis_relative_angle_set = 0.0f;
-	}
-	//切入跟随云台模式
-	else if((chassis_move_transit->last_chassis_mode != CHASSIS_VECTOR_FOLLOW_GIMBAL_YAW) && chassis_move_transit->chassis_mode == CHASSIS_VECTOR_FOLLOW_GIMBAL_YAW)
-	{
-		chassis_move_transit->chassis_relative_angle_set = 0.0f;
-	}
-	//切入底盘旋转模式
-	else if((chassis_move_transit->last_chassis_mode != CHASSIS_VECTOR_SPIN) && chassis_move_transit->chassis_mode == CHASSIS_VECTOR_SPIN)
-	{
-		chassis_move_transit->chassis_relative_angle_set = chassis_move_transit->chassis_yaw;
-	}
-	
-	chassis_move_transit->last_chassis_mode = chassis_move_transit->chassis_mode;
-}
+
 
 /**
   * @brief          根据遥控器通道值，计算纵向和横移速度
@@ -265,37 +234,7 @@ static void chassis_set_contorl(chassis_move_t *chassis_move_control)
 	chassis_behaviour_control_set(&vx_set, &vy_set, &wz_set, chassis_move_control);
 	wz_set = - wz_set;
 	
-	if (chassis_move_control->chassis_mode == CHASSIS_VECTOR_RETURN) //底盘零点回当前云台朝向
-	{
-		
-		/* 在电脑屏幕上添加显示 回正模式标志 的代码，如：当前为回正模式 */
-		
-		//“wz_set”是旋转速度设置，此时为后面pid算出的值
-		chassis_move_control->wz_set = -chassis_move_control->return_wz_set * 0.00006f;  //输出最大为 限幅 * 0.00006f, 原来为0.00004f
-		//chassis_move_control->wz_set = 0.0;
-		if (fabs(chassis_move_control->wz_set) < 0.001f && chassis_move_control->chassis_return_record == CHASSIS_VECTOR_RETURN)  //回正后恢复正常控制
-		{
-			chassis_move_control->wz_set = 0;
-			chassis_move_control->chassis_return_flag = 0;  //这是在左档依旧打下时退出回正模式转入正常控制的关键
-			
-		/* 在电脑屏幕上添加显示 回正模式完成 的代码，如：已完成回正 */
-		
-		}
-		
-		//为满足旋转变换而定义的数组变量
-		fp32 vector[2] = {vx_set, vy_set};
-		
-		//对速度向量旋转变换
-		vector_rotate(chassis_move_control->gimbal_radian_of_ecd + CHASSIS_RETURN_OFFSET, vector);
-		
-		vx_set = vector[0];
-		vy_set = vector[1];
-		
-		//速度限幅
-		chassis_move_control->vx_set = fp32_constrain(vx_set, chassis_move_control->vx_min_speed, chassis_move_control->vx_max_speed);
-		chassis_move_control->vy_set = fp32_constrain(vy_set, chassis_move_control->vy_min_speed, chassis_move_control->vy_max_speed);
-	}
-	else if (chassis_move_control->chassis_mode == CHASSIS_VECTOR_NO_MOVE)
+	if (chassis_move_control->chassis_mode == CHASSIS_VECTOR_NO_MOVE)
 	{
 		chassis_move_control->vx_set = vx_set = 0.0f;
 		chassis_move_control->vy_set = vy_set = 0.0f;
@@ -325,10 +264,6 @@ static void chassis_set_contorl(chassis_move_t *chassis_move_control)
 		//“wz_set”是旋转速度设置
 		chassis_move_control->wz_set = wz_set;
 		
-		if (chassis_move_control->chassis_mode == CHASSIS_VECTOR_RETURN)  
-		{
-			chassis_move_control->wz_set = 0;
-		}
 		//为满足旋转变换而定义的数组变量
 		fp32 vector[2] = {vx_set, vy_set};
 		
@@ -345,7 +280,6 @@ static void chassis_set_contorl(chassis_move_t *chassis_move_control)
 }
 
 //把小写的变量赋值成对应宏，用于调试，调试结束后应删除变量使用宏定义
-fp32 chassis_return_target = CHASSIS_RETURN_TARGET;
 
 /*************************************************************
   * @brief          底盘在抑制舵向电机角度跳变下的PID计算
@@ -359,24 +293,6 @@ static void PID_Calc_Jump(chassis_move_t *chassis_pid_calc)
 	for(uint8_t i = 0; i < 4; i++)
 	{
 		// 云台回正模式的角度处理
-		if (chassis_pid_calc->chassis_mode == CHASSIS_VECTOR_RETURN)
-		{
-			fp32 target = rad_format(chassis_return_target);  // 直接使用宏
-			fp32 actual = rad_format(chassis_pid_calc->gimbal_radian_of_ecd);
-			
-			// 避免角度跳变
-			if(fabs(actual - target) > PI)
-			{
-				fp32 adjusted_target = (target < 0) ? target + 2*PI : target - 2*PI;
-				chassis_pid_calc->return_wz_set = PID_calc(&chassis_pid_calc->chas_return_pid, actual, adjusted_target);
-			}
-			else
-			{
-				chassis_pid_calc->return_wz_set = PID_calc(&chassis_pid_calc->chas_return_pid, actual, target);
-			}
-  	}
-		
-		// 无控制状态下的角度处理
 		bool no_control = (fabsf(chassis_pid_calc->vx_set) < 0.1f && fabsf(chassis_pid_calc->vy_set) < 0.1f && fabsf(chassis_pid_calc->wz_set) < 0.001f);
 		
 		if(no_control)
@@ -384,7 +300,7 @@ static void PID_Calc_Jump(chassis_move_t *chassis_pid_calc)
 			switch(chassis_pid_calc->chassis_mode)
 			{
 				case CHASSIS_VECTOR_FOLLOW_GIMBAL_YAW:
-					if (chassis_pid_calc->chassis_return_record != chassis_pid_calc->chassis_mode)
+					if (chassis_pid_calc->wheel_last_mode != chassis_pid_calc->chassis_mode)
 					{
 						count = 2001;
 					}
@@ -422,7 +338,7 @@ static void PID_Calc_Jump(chassis_move_t *chassis_pid_calc)
 			chassis_pid_calc->wheel_angle_offset.last[i] = chassis_pid_calc->chassis_6020[i].angle;
 		}
 		
-		chassis_pid_calc->chassis_return_record = chassis_pid_calc->chassis_mode;
+		chassis_pid_calc->wheel_last_mode = chassis_pid_calc->chassis_mode;
 		
 		// 3508电机PID计算
 		PID_calc(&chassis_pid_calc->chas_3508_pid[i], chassis_pid_calc->chassis_3508[i].speed, chassis_pid_calc->chassis_3508[i].speed_set);
@@ -486,13 +402,16 @@ static void chassis_control_loop(chassis_move_t *chassis_move_control_loop)
 	}
 	
 //	//打滑抑制
-//	slip_control(chassis_move_control_loop);
 	
 	//底盘在抑制舵向电机角度跳变下的PID计算，定义在这个函数前面
 	PID_Calc_Jump(chassis_move_control_loop);
 	
-	//功率控制(在 chassis_power_control() 函数中给舵轮3508和6020电机赋值电流值)
-	chassis_power_control(chassis_move_control_loop);
+	// Current configuration sends PID outputs directly (no power limiter).
+	for (uint8_t i = 0; i < 4; i++)
+	{
+		chassis_move_control_loop->chassis_3508[i].give_current = (int16_t)chassis_move_control_loop->chas_3508_pid[i].out;
+		chassis_move_control_loop->chassis_6020[i].give_current = (int16_t)chassis_move_control_loop->chas_6020_speed_pid[i].out;
+	}
 }
 
 /**
@@ -502,28 +421,23 @@ static void chassis_control_loop(chassis_move_t *chassis_move_control_loop)
   */
 void chassis_task(void const *pvParameters)
 {
-	//HAL_IWDG_Refresh(&hiwdg);
 	vTaskDelay(CHASSIS_TASK_INIT_TIME);	//空闲一段时间
-	//HAL_IWDG_Refresh(&hiwdg);
 	chassis_init(&chassis_move); //底盘初始化
 	
 	/*
 	 * ========================================================================
-	 * ����1�����̿���ѭ������������ж�
+	 * 步骤1：底盘控制循环与输出许可判断
 	 * ========================================================================
-	 * ����Դ��ң�������ݣ�RC_data_is_error �ж�����������Ϊ�� PID ������
-	 * ������
-	 * 1) ����ִ��ģʽ���á��������¡������������� PID ����
-	 * 2) ң�������ݷǷ�ʱ�����̵���������������ʱ���Ϳ��Ƶ���
+	 * 数据源：遥控器数据（RC_data_is_error 判定）、底盘行为与 PID 计算结果
+	 * 操作：
+	 * 1) 依次执行模式设置、反馈更新、控制量设置与 PID 计算
+	 * 2) 遥控器数据非法时给底盘电机发零电流，正常时发送控制电流
 	 */
-	while (1)
-	
 	while (1)
 	{
 		//设置底盘控制模式
 		chassis_set_mode(&chassis_move);
 		//模式切换数据保存
-		chassis_mode_change_control_transit(&chassis_move);
 		//底盘数据更新
 		chassis_feedback_update(&chassis_move);
 		//底盘控制量设置
@@ -531,7 +445,7 @@ void chassis_task(void const *pvParameters)
 		//底盘控制PID计算
 		chassis_control_loop(&chassis_move);
 
-		// 1.1 ң�������ݷǷ�ʱ�������������ò���������������
+		// 1.1 遥控器数据非法时清空输出，避免用残留数据驱动底盘
 		if (RC_data_is_error())
 		{
 			CAN_cmd_CHAS_6020(0, 0, 0, 0);
@@ -539,13 +453,12 @@ void chassis_task(void const *pvParameters)
 		}
 		else
 		{
-			// 1.2 ���Ϳ��Ƶ���
+			// 1.2 发送控制电流
 			CAN_cmd_CHAS_6020(chassis_move.chassis_6020[0].give_current, chassis_move.chassis_6020[1].give_current,
 												chassis_move.chassis_6020[2].give_current, chassis_move.chassis_6020[3].give_current);
 			CAN_cmd_CHAS_3508(chassis_move.chassis_3508[0].give_current,chassis_move.chassis_3508[1].give_current,
 												chassis_move.chassis_3508[2].give_current,chassis_move.chassis_3508[3].give_current);
 			
-			HAL_IWDG_Refresh(&hiwdg);
 		}
 		//系统延时
 		//vTaskDelay(CHASSIS_CONTROL_TIME_MS);

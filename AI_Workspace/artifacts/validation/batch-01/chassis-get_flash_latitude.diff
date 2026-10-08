@@ -1,0 +1,21 @@
+--- before
++++ after
+@@ -1,14 +1,6 @@
+ {
+-	if (latitude == 0)
+-	{
+-		return;
+-	}
+-	if (cali_sensor[CALI_HEAD].cali_done == 0x55)
+-	{
+-		*latitude = head_cali.latitude;
+-	}
+-	else
+-	{
+-		*latitude = 22.0f;
+-	}
++    if (latitude != 0)
++    {
++        *latitude = head_cali_done == 0x55 ? head_cali.latitude : 22.0f;
++    }
+ }

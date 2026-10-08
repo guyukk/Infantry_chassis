@@ -1,0 +1,7 @@
+# Full recovery bundles and reproducible temporary files stay local.
+/snapshots/
+/cache/
+/artifacts/logs/
+/artifacts/structure-01/original-tools/
+__pycache__/
+*.pyc

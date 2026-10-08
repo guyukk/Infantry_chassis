@@ -1,0 +1,16 @@
+{
+  "keil_executable": "D:/keil5/UV4/UV4.exe",
+  "cubemx_executable": "C:/Users/guyukk/AppData/Local/Programs/STM32CubeMX/STM32CubeMX.exe",
+  "projects": {
+    "chassis": {
+      "root": ".",
+      "project": "MDK-ARM/standard_tpye_c.uvprojx",
+      "target": "standard_tpye_c"
+    },
+    "gimbal": {
+      "root": "../../../../../cloud_platform/H7_new/H7_new/DM-balanceV1",
+      "project": "MDK-ARM/CtrlBoard-H7_IMU.uvprojx",
+      "target": "CtrlBoard-H7_IMU"
+    }
+  }
+}

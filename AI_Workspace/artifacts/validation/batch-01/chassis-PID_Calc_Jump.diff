@@ -1,0 +1,45 @@
+--- before
++++ after
+@@ -3,24 +3,6 @@
+ 	
+ 	for(uint8_t i = 0; i < 4; i++)
+ 	{
+-		
+-		if (chassis_pid_calc->chassis_mode == CHASSIS_VECTOR_RETURN)
+-		{
+-			fp32 target = loop_fp32_constrain((chassis_return_target), -3.14159265358979f, 3.14159265358979f);  
+-			fp32 actual = loop_fp32_constrain((chassis_pid_calc->gimbal_radian_of_ecd), -3.14159265358979f, 3.14159265358979f);
+-			
+-			
+-			if(fabs(actual - target) > 3.14159265358979f)
+-			{
+-				fp32 adjusted_target = (target < 0) ? target + 2*3.14159265358979f : target - 2*3.14159265358979f;
+-				chassis_pid_calc->return_wz_set = PID_calc(&chassis_pid_calc->chas_return_pid, actual, adjusted_target);
+-			}
+-			else
+-			{
+-				chassis_pid_calc->return_wz_set = PID_calc(&chassis_pid_calc->chas_return_pid, actual, target);
+-			}
+-  	}
+-		
+ 		
+ 		_Bool no_control = (fabsf(chassis_pid_calc->vx_set) < 0.1f && fabsf(chassis_pid_calc->vy_set) < 0.1f && fabsf(chassis_pid_calc->wz_set) < 0.001f);
+ 		
+@@ -29,7 +11,7 @@
+ 			switch(chassis_pid_calc->chassis_mode)
+ 			{
+ 				case CHASSIS_VECTOR_FOLLOW_GIMBAL_YAW:
+-					if (chassis_pid_calc->chassis_return_record != chassis_pid_calc->chassis_mode)
++					if (chassis_pid_calc->wheel_last_mode != chassis_pid_calc->chassis_mode)
+ 					{
+ 						count = 2001;
+ 					}
+@@ -67,7 +49,7 @@
+ 			chassis_pid_calc->wheel_angle_offset.last[i] = chassis_pid_calc->chassis_6020[i].angle;
+ 		}
+ 		
+-		chassis_pid_calc->chassis_return_record = chassis_pid_calc->chassis_mode;
++		chassis_pid_calc->wheel_last_mode = chassis_pid_calc->chassis_mode;
+ 		
+ 		
+ 		PID_calc(&chassis_pid_calc->chas_3508_pid[i], chassis_pid_calc->chassis_3508[i].speed, chassis_pid_calc->chassis_3508[i].speed_set);

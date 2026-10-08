@@ -1,0 +1,11 @@
+--- before
++++ after
+@@ -93,7 +93,7 @@
+ 		IMU_Temp_Cnt++;
+ 		if(IMU_Temp_Cnt >1000){
+ 
+-				IMU_TempCtrl(BMI088.TempWhenCali, BMI088.Temperature);
++
+ 
+ 			IMU_Temp_Cnt = 0;
+ 		}

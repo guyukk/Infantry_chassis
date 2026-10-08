@@ -29,12 +29,9 @@
 
 #include "arm_math.h"
 #include "chassis_behaviour.h"
-#include "chassis_power_control.h"
 #include "chassis_task.h"
 #include "cmsis_os.h"
-#include "gimbal_behaviour.h"
 #include "robot_param.h"
-#include <stdbool.h>
 
 /* 函数声明区 */
 static void chassis_no_move_control											(fp32 *vx_set, fp32 *vy_set, fp32 *wz_set, chassis_move_t *chassis_move_rc_to_vector);
@@ -42,9 +39,7 @@ static void chassis_infantry_follow_gimbal_yaw_control	(fp32 *vx_set, fp32 *vy_s
 static void chassis_spin_control												(fp32 *vx_set, fp32 *vy_set, fp32 *wz_set, chassis_move_t *chassis_move_rc_to_vector);
 
 
-//底盘行为模式变量, 会保存当前底盘行为模式, 初始化为无力模式
 chassis_behaviour_e chassis_behaviour_mode = CHASSIS_NO_MOVE;
-extern super_cap_mode_e super_cap_mode;
 
 /**
   * @brief          根据遥控器开关位置和键盘输入设置底盘行为模式, 并为每种行为模式选择合适的底盘控制模式
@@ -57,7 +52,7 @@ void chassis_behaviour_mode_set(chassis_move_t *chassis_move_mode)
 
 	//遥控器设置模式，以下参数均可选择
 	//CHASSIS_ZERO_FORCE, CHASSIS_NO_MOVE, CHASSIS_FOLLOW_GIMBAL_YAW, CHASSIS_OPEN, CHASSIS_SPIN
-	if (switch_is_down(chassis_move_mode->chassis_RC->rc.s[CHASSIS_MODE_CHANNEL]) || chassis_move_mode->chassis_return_flag == 0)
+	if (switch_is_down(chassis_move_mode->chassis_RC->rc.s[CHASSIS_MODE_CHANNEL]))
 	{
 		chassis_behaviour_mode = CHASSIS_FOLLOW_GIMBAL_YAW;		//下档跟随云台模式
 	}
@@ -70,33 +65,20 @@ void chassis_behaviour_mode_set(chassis_move_t *chassis_move_mode)
 		chassis_behaviour_mode = CHASSIS_SPIN;	//上档小陀螺模式
 	}
 	
-//	if (switch_is_down(chassis_move_mode->chassis_RC->rc.s[0]) && switch_is_down(chassis_move_mode->chassis_RC->rc.s[1]) && chassis_move_mode->chassis_return_flag == 1)
-//	{
-//		chassis_behaviour_mode = CHASSIS_RETURN;	//右边开关为下档 且 左边开关为下档 底盘回正
-//	}
-	
-	if (chassis_move_mode->chassis_RC->rc.s[1] != 2)
-	{
-		chassis_move_mode->chassis_return_flag = 1;
-	}
 	
 	/* 遥控器在下档，根据键盘x、c、shift来改变模式，每2个毫秒刷新一次，所以要一直按着才能保证模式正确 */
-	if (switch_is_down(chassis_move_mode->chassis_RC->rc.s[CHASSIS_MODE_CHANNEL]) && (chassis_move_mode->chassis_RC->key.v & GIMBAL_ZERO_KEYBOARD))
+	if (switch_is_down(chassis_move_mode->chassis_RC->rc.s[CHASSIS_MODE_CHANNEL]) && (chassis_move_mode->chassis_RC->key.v & CHASSIS_STOP_KEYBOARD))
 	{
 		chassis_behaviour_mode = CHASSIS_NO_MOVE;		//x键 静止模式
 	}
-	else if (switch_is_down(chassis_move_mode->chassis_RC->rc.s[CHASSIS_MODE_CHANNEL]) && (chassis_move_mode->chassis_RC->key.v & GIMBAL_RELATIVE_KEYBOARD))
+	else if (switch_is_down(chassis_move_mode->chassis_RC->rc.s[CHASSIS_MODE_CHANNEL]) && (chassis_move_mode->chassis_RC->key.v & CHASSIS_FOLLOW_KEYBOARD))
 	{
 		chassis_behaviour_mode = CHASSIS_FOLLOW_GIMBAL_YAW;		//c键 跟随云台模式
 	}
-	else if(switch_is_down(chassis_move_mode->chassis_RC->rc.s[CHASSIS_MODE_CHANNEL]) && (chassis_move_mode->chassis_RC->key.v & GIMBAL_SPIN_KEYBOARD))
+	else if(switch_is_down(chassis_move_mode->chassis_RC->rc.s[CHASSIS_MODE_CHANNEL]) && (chassis_move_mode->chassis_RC->key.v & CHASSIS_SPIN_KEYBOARD))
 	{
 		chassis_behaviour_mode = CHASSIS_SPIN;	//shift键 小陀螺模式
 	}
-//	else if(switch_is_down(chassis_move_mode->chassis_RC->rc.s[CHASSIS_MODE_CHANNEL]) && (chassis_move_mode->chassis_RC->key.v & GIMBAL_RETURN_KEYBOARD))
-//	{
-//		chassis_behaviour_mode = CHASSIS_RETURN;	//z键 回正模式
-//	}
 
 	//根据行为模式选择一个底盘控制模式
 	if (chassis_behaviour_mode == CHASSIS_NO_MOVE)	//静止模式
@@ -111,21 +93,8 @@ void chassis_behaviour_mode_set(chassis_move_t *chassis_move_mode)
 	{
 		chassis_move_mode->chassis_mode = CHASSIS_VECTOR_SPIN;	//速度小陀螺模式
 	}
-//	else if (chassis_behaviour_mode == CHASSIS_RETURN)
-//	{
-//		chassis_move_mode->chassis_mode = CHASSIS_VECTOR_RETURN;  //底盘自传零点到云台当前方向
-//	}
 	
-	{
-		//超级电容开启或关闭
-		static bool pressed_Q = false, last_pressed_Q = false;
-		pressed_Q = (chassis_move_mode->chassis_RC->key.v & KEY_PRESSED_OFFSET_Q);
-		if(pressed_Q && !last_pressed_Q && super_cap_mode >= SUPER_CAP_PREPARED)
-		{
-			super_cap_mode = (super_cap_mode == SUPER_CAP_PREPARED) ? SUPER_CAP_USING : SUPER_CAP_PREPARED;
-		}
-		last_pressed_Q = pressed_Q;
-	}
+
 }
 
 /**
@@ -172,7 +141,6 @@ static void chassis_no_move_control(fp32 *vx_set, fp32 *vy_set, fp32 *wz_set, ch
     *wz_set = 0.0f;
 }
 
-//把小写的变量赋值成对应宏，用于调试，调试结束后应删除变量使用宏定义
 fp32 chassis_wz_rc_sen = CHASSIS_WZ_RC_SEN;
 
 /**
@@ -197,7 +165,6 @@ static void chassis_infantry_follow_gimbal_yaw_control(fp32 *vx_set, fp32 *vy_se
 	*wz_set = -(fp32)wz_channel * chassis_wz_rc_sen;
 }
 
-fp32 chassis_spin_speed = CHASSIS_SPIN_SPEED;
 
 /**
   * @brief          设置固定的旋转速度wz, 在根据遥控器输入设置vx和vy

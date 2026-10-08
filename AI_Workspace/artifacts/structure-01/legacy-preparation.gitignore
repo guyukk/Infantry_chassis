@@ -1,0 +1,6 @@
+# Keep reports and scripts reviewable; source snapshots and build evidence stay local.
+baseline-*/
+before-batch-*/
+after-batch-*/
+build-*/
+__pycache__/

@@ -1,0 +1,38 @@
+--- before
++++ after
+@@ -1,24 +1,15 @@
+ {
+-	uint8_t i = 0;
++    uint32_t trailer;
++    imu_cali_t gyro_cali;
+ 
+-	for (i = 0; i < CALI_LIST_LENGHT; i++)
+-	{
+-		cali_sensor[i].flash_len = cali_sensor_size[i];
+-		cali_sensor[i].flash_buf = cali_data_addr_buf[i];
+-		cali_sensor[i].cali_hook = (bool_t(*)(uint32_t *, bool_t))cali_hook_fun[i];
+-	}
++    flash_read(((uint32_t)0x080A0000), (uint32_t *)&head_cali, sizeof(head_cali) / 4);
++    flash_read(((uint32_t)0x080A0000) + sizeof(head_cali), &trailer, 1);
++    head_cali_done = ((uint8_t *)&trailer)[3];
+ 
+-	cali_data_read();
+-	
+-	
+-	for (i = 0; i < CALI_LIST_LENGHT; i++)
+-	{
+-		if (cali_sensor[i].cali_done == 0x55)
+-		{
+-			if (cali_sensor[i].cali_hook != 0)
+-			{
+-				cali_sensor[i].cali_hook(cali_data_addr_buf[i], 0);
+-			}
+-		}
+-	}
++    flash_read(((uint32_t)0x080A0000) + (sizeof(head_cali_t) + sizeof(gimbal_cali_t) + 2U * 4U), (uint32_t *)&gyro_cali, sizeof(gyro_cali) / 4);
++    flash_read(((uint32_t)0x080A0000) + (sizeof(head_cali_t) + sizeof(gimbal_cali_t) + 2U * 4U) + sizeof(gyro_cali), &trailer, 1);
++    if (((uint8_t *)&trailer)[3] == 0x55)
++    {
++        INS_set_cali_gyro(gyro_cali.scale, gyro_cali.offset);
++    }
+ }

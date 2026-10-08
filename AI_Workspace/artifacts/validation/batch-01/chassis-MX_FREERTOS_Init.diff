@@ -1,0 +1,11 @@
+--- before
++++ after
+@@ -41,8 +41,6 @@
+ 	const osThreadDef_t os_thread_def_SERVO = { "SERVO", (servo_task), (osPriorityNormal), (0), (128), 0, 0 };
+ 	servo_task_handle = osThreadCreate(&os_thread_def_SERVO, 0);
+ 	
+-	const osThreadDef_t os_thread_def_IDLE = { "IDLE", (idle_task), (osPriorityNormal), (0), (64), 0, 0 };
+-	idle_task_handle = osThreadCreate(&os_thread_def_IDLE, 0);
+ 
+ 	const osThreadDef_t os_thread_def_UI = { "UI", (UI_task), (osPriorityNormal), (0), (512), 0, 0 };
+ 	UI_task_handle = osThreadCreate(&os_thread_def_UI, 0);

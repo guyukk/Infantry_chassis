@@ -1,0 +1,59 @@
+--- before
++++ after
+@@ -3,7 +3,7 @@
+ 
+ 	
+ 	
+-	if ((chassis_move_mode ->chassis_RC->rc . s[0] == ((uint16_t)2)) || chassis_move_mode->chassis_return_flag == 0)
++	if ((chassis_move_mode ->chassis_RC->rc . s[0] == ((uint16_t)2)))
+ 	{
+ 		chassis_behaviour_mode = CHASSIS_FOLLOW_GIMBAL_YAW;		
+ 	}
+@@ -16,15 +16,6 @@
+ 		chassis_behaviour_mode = CHASSIS_SPIN;	
+ 	}
+ 	
+-
+-
+-
+-
+-	
+-	if (chassis_move_mode->chassis_RC->rc.s[1] != 2)
+-	{
+-		chassis_move_mode->chassis_return_flag = 1;
+-	}
+ 	
+ 	 
+ 	if ((chassis_move_mode ->chassis_RC->rc . s[0] == ((uint16_t)2)) && (chassis_move_mode->chassis_RC->key.v & ((uint16_t)1 << 12)))
+@@ -40,10 +31,6 @@
+ 		chassis_behaviour_mode = CHASSIS_SPIN;	
+ 	}
+ 
+-
+-
+-
+-
+ 	
+ 	if (chassis_behaviour_mode == CHASSIS_NO_MOVE)	
+ 	{
+@@ -57,19 +44,6 @@
+ 	{
+ 		chassis_move_mode->chassis_mode = CHASSIS_VECTOR_SPIN;	
+ 	}
++	
+ 
+-
+-
+-
+-	
+-	{
+-		
+-		static _Bool pressed_Q = 0, last_pressed_Q = 0;
+-		pressed_Q = (chassis_move_mode->chassis_RC->key.v & ((uint16_t)1 << 6));
+-		if(pressed_Q && !last_pressed_Q && super_cap_mode >= SUPER_CAP_PREPARED)
+-		{
+-			super_cap_mode = (super_cap_mode == SUPER_CAP_PREPARED) ? SUPER_CAP_USING : SUPER_CAP_PREPARED;
+-		}
+-		last_pressed_Q = pressed_Q;
+-	}
+ }

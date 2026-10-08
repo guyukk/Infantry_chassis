@@ -55,3 +55,6 @@
 *.bin
 *.iex
 *.ini
+
+# Keil output directory is regenerated from the project configuration.
+/MDK-ARM/standard_tpye_c/

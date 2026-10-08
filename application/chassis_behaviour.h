@@ -24,16 +24,18 @@
 #include "chassis_task.h"
 #include "struct_typedef.h"
 
+#define CHASSIS_STOP_KEYBOARD KEY_PRESSED_OFFSET_X
+#define CHASSIS_FOLLOW_KEYBOARD KEY_PRESSED_OFFSET_C
+#define CHASSIS_SPIN_KEYBOARD KEY_PRESSED_OFFSET_SHIFT
+
 typedef enum
 {
-	CHASSIS_NO_MOVE,								//底盘保持静止
-	CHASSIS_FOLLOW_GIMBAL_YAW,			//底盘跟随云台yaw角度
-	CHASSIS_SPIN,										//旋转模式
-	CHASSIS_RETURN,									//底盘回正
+	CHASSIS_NO_MOVE = 0,								//底盘保持静止
+	CHASSIS_FOLLOW_GIMBAL_YAW = 1,			//底盘跟随云台yaw角度
+	CHASSIS_SPIN = 2,										//旋转模式
 	
 } chassis_behaviour_e;
 
-#define CHASSIS_OPEN_RC_SCALE 10		//在 CHASSIS_OPEN 模式下, 遥控器乘以该比例发送到can上
 
 
 //根据遥控器输入设置底盘行为模式

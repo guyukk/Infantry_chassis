@@ -1,0 +1,33 @@
+--- before
++++ after
+@@ -10,10 +10,9 @@
+ 	gimbal_behaviour_now = (uint8_t)gimbal_behaviour;
+ 	extern shoot_control_t shoot_control; 
+ 	shoot_mode_now = shoot_control.shoot_mode;
+-
++		
+ 	
+ 	const static uint8_t length = 46;
+-
+ 	static uint8_t data_chassis[length];		
+ 	
+ 	 
+@@ -46,11 +45,16 @@
+ 	
+ 	data_chassis[18] = shoot_mode_now;					
+ 	
+-	for(uint8_t i = 0; i <= 25; i ++)						
++	
++	for(uint8_t i = 0; i < sizeof(vtm_data) - 2U; i ++)
+ 	{
+ 		data_chassis[19 + i] = vtm_data_ptr[2 + i];
+ 	}
+-
++	for(uint8_t i = sizeof(vtm_data) - 2U; i < 26U; i ++)
++	{
++		data_chassis[19 + i] = 0;
++	}
++	
+ 
+   data_chassis[length - 1] = 0XFD;  
+ 	 

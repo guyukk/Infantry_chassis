@@ -15,7 +15,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "pm01_api.h"
-#include "chassis_power_control.h"
+// PM01 default setpoint retained from the former power-control module.
+#define SET_POWER_VALUE 90.0f
 
 
 volatile pm01_od_t pm01_od;
