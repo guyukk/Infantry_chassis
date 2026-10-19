@@ -17,7 +17,7 @@ static void send_to_gimbal(void);
 
 
 /**
-  * @brief          云台任务，间隔 GIMBAL_CONTROL_TIME 1ms
+  * @brief          底盘状态发送任务；每次发送后延迟 10 tick（当前为 10 ms）
   * @param[in]      pvParameters: 空
   * @retval         none
   */

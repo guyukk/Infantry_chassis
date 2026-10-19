@@ -56,5 +56,6 @@
 *.iex
 *.ini
 
-# Keil output directory is regenerated from the project configuration.
+# Keil output directories are regenerated from the project configuration.
 /MDK-ARM/standard_tpye_c/
+/MDK-ARM/Infantry_chassis/
