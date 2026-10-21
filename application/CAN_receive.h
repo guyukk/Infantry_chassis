@@ -37,6 +37,19 @@ typedef struct
 	
 } MOTOR_MEASURE_t;
 
+typedef struct
+{
+	uint8_t last_status;
+	uint32_t last_error;
+	uint32_t last_mailbox;
+	uint32_t success_count;
+	uint32_t failure_count;
+} CAN_6020_tx_diag_t;
+
+extern volatile CAN_6020_tx_diag_t can_6020_tx_diag;
+extern volatile uint32_t can_6020_last_feedback_ms[4];
+extern uint8_t CAN_6020_feedback_is_fresh(uint32_t timeout_ms);
+
 
 /* 本工程固件为底盘板（chassis_board）：CAN1 收发 3508，CAN2 收发 6020。 */
 #define CHASSIS_3508_CAN hcan1  //2p
