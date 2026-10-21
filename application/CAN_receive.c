@@ -23,7 +23,7 @@
 #include "cmsis_os.h"
 #include "bsp_rng.h"
 #include "bsp_usart.h"
-#include "chassis_6020_bench_time.h"
+#include "robot_param.h"
 
 //电机数据读取
 #define get_motor_measure(ptr, data)                                \
@@ -44,22 +44,7 @@ static CAN_TxHeaderTypeDef  chassis_tx_message;
 static uint8_t chassis_can_send_data[8];
 //static MOTOR_MEASURE_t motor_chas[8];	//底盘上有8个电机
 MOTOR_MEASURE_t motor_chas[8];	//底盘上有8个电机
-volatile CAN_6020_tx_diag_t can_6020_tx_diag;
-volatile uint32_t can_6020_last_feedback_ms[4];
-
-uint8_t CAN_6020_feedback_is_fresh(uint32_t timeout_ms)
-{
-	uint32_t now = HAL_GetTick();
-	for (uint8_t i = 0; i < 4; i++)
-	{
-		if (!bench_6020_time_fresh(now, can_6020_last_feedback_ms[i],
-			can_6020_last_feedback_ms[i] != 0, timeout_ms))
-		{
-			return 0;
-		}
-	}
-	return 1;
-}
+volatile CHAS_6020_TX_DEBUG_t chassis_6020_tx_debug;
 	
 /**
   * @brief          HAL库CAN回调函数,接收底盘电机数据
@@ -71,10 +56,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 	CAN_RxHeaderTypeDef rx_header;
 	uint8_t rx_data[8];
 	
-	if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &rx_header, rx_data) != HAL_OK)
-	{
-		return;
-	}
+	HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &rx_header, rx_data);
 	
 	switch (rx_header.StdId)
 	{
@@ -90,12 +72,6 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 			static uint8_t i = 0;
 			i = rx_header.StdId - CAN1_3508_M1_ID;
 			get_motor_measure(&motor_chas[i], rx_data);
-			if (hcan == &hcan2 && rx_header.IDE == CAN_ID_STD &&
-				rx_header.DLC >= 7 && rx_header.StdId >= CAN2_6020_M1_ID &&
-				rx_header.StdId <= CAN2_6020_M4_ID)
-			{
-				can_6020_last_feedback_ms[rx_header.StdId - CAN2_6020_M1_ID] = HAL_GetTick();
-			}
 			break;
 		}
 		case 0x600:
@@ -153,7 +129,12 @@ void CAN_cmd_CHAS_3508(int16_t motor1, int16_t motor2, int16_t motor3, int16_t m
 void CAN_cmd_CHAS_6020(int16_t motor5, int16_t motor6, int16_t motor7, int16_t motor8)
 {
 	uint32_t send_mail_box;
+	HAL_StatusTypeDef status;
+	#if CHASSIS_6020_ONLY_TEST && CHASSIS_6020_VOLTAGE_COMMAND_TEST
+	chassis_tx_message.StdId = CAN2_CHAS_6020_VOLTAGE_ID;
+	#else
 	chassis_tx_message.StdId = CAN2_CHAS_6020_ID;
+	#endif
 	chassis_tx_message.IDE = CAN_ID_STD;
 	chassis_tx_message.RTR = CAN_RTR_DATA;
 	chassis_tx_message.DLC = 0x08;
@@ -166,18 +147,24 @@ void CAN_cmd_CHAS_6020(int16_t motor5, int16_t motor6, int16_t motor7, int16_t m
 	chassis_can_send_data[6] = motor8 >> 8;
 	chassis_can_send_data[7] = motor8;
 
-	HAL_StatusTypeDef status = HAL_CAN_AddTxMessage(&CHASSIS_6020_CAN, &chassis_tx_message, chassis_can_send_data, &send_mail_box);
-	can_6020_tx_diag.last_status = (uint8_t)status;
-	can_6020_tx_diag.last_error = HAL_CAN_GetError(&CHASSIS_6020_CAN);
+	chassis_6020_tx_debug.std_id = chassis_tx_message.StdId;
+	chassis_6020_tx_debug.command[0] = motor5;
+	chassis_6020_tx_debug.command[1] = motor6;
+	chassis_6020_tx_debug.command[2] = motor7;
+	chassis_6020_tx_debug.command[3] = motor8;
+	chassis_6020_tx_debug.can_tsr = CHASSIS_6020_CAN.Instance->TSR;
+	status = HAL_CAN_AddTxMessage(&CHASSIS_6020_CAN, &chassis_tx_message, chassis_can_send_data, &send_mail_box);
+	chassis_6020_tx_debug.hal_status = (uint8_t)status;
 	if (status == HAL_OK)
 	{
-		can_6020_tx_diag.last_mailbox = send_mail_box;
-		can_6020_tx_diag.success_count++;
+		chassis_6020_tx_debug.submit_ok_count++;
 	}
 	else
 	{
-		can_6020_tx_diag.failure_count++;
+		chassis_6020_tx_debug.submit_error_count++;
 	}
+	chassis_6020_tx_debug.can_error_code = CHASSIS_6020_CAN.ErrorCode;
+	chassis_6020_tx_debug.can_esr = CHASSIS_6020_CAN.Instance->ESR;
 	//usart1_tx_dma_enable( chassis_can_send_data, 8);
 }
 

@@ -25,7 +25,6 @@
 #include "CAN_receive.h"
 #include "pid.h"
 #include "remote_control.h"
-#include "chassis_6020_bench_config.h"
 #include "user_lib.h"
 #include "INS_task.h"
 
@@ -178,44 +177,6 @@ typedef struct
 	fp32 chassis_roll;  //陀螺仪和云台电机叠加的roll角度
 	
 } chassis_move_t;
-
-#if CHASSIS_6020_BENCH_TEST
-#define CHASSIS_6020_BENCH_TRACE_COUNT 128U
-typedef struct
-{
-	uint16_t ecd;
-	float target_rad;
-	int16_t speed_rpm;
-	float speed_target_rpm;
-	int16_t command_current;
-	int16_t feedback_current;
-} chassis_6020_bench_motor_sample_t;
-
-typedef struct
-{
-	uint32_t time_ms;
-	uint32_t can_error;
-	uint16_t feedback_age_ms[4];
-	int16_t rc_axis;
-	uint8_t switch_left;
-	uint8_t switch_right;
-	uint8_t state;
-	uint8_t tx_status;
-	chassis_6020_bench_motor_sample_t motor[4];
-} chassis_6020_bench_sample_t;
-
-typedef struct
-{
-	uint32_t samples_written;
-	uint16_t next_index;
-	uint8_t state;
-	uint8_t last_disarm_reason;
-	uint8_t frozen;
-	chassis_6020_bench_sample_t sample[CHASSIS_6020_BENCH_TRACE_COUNT];
-} chassis_6020_bench_trace_t;
-
-extern volatile chassis_6020_bench_trace_t chassis_6020_bench_trace;
-#endif
 
 
 extern void chassis_task(void const *pvParameters);

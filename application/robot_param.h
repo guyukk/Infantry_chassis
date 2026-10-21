@@ -11,6 +11,11 @@
 #ifndef ROBOT_PARAM_H
 #define ROBOT_PARAM_H
 
+/* Standalone chassis-board check: four 6020 + DBUS, without 3508 motors. */
+#define CHASSIS_6020_ONLY_TEST 1
+// 台架使用 GM6020 默认支持的电压控制帧；量产路径仍使用原电流控制帧。
+#define CHASSIS_6020_VOLTAGE_COMMAND_TEST 1
+
 #include "struct_typedef.h"
 
 /* 本工程固件配置：普通步兵 + 舵轮底盘 + 底盘板，无其他车型/板型选项。 */

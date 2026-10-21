@@ -37,19 +37,6 @@ typedef struct
 	
 } MOTOR_MEASURE_t;
 
-typedef struct
-{
-	uint8_t last_status;
-	uint32_t last_error;
-	uint32_t last_mailbox;
-	uint32_t success_count;
-	uint32_t failure_count;
-} CAN_6020_tx_diag_t;
-
-extern volatile CAN_6020_tx_diag_t can_6020_tx_diag;
-extern volatile uint32_t can_6020_last_feedback_ms[4];
-extern uint8_t CAN_6020_feedback_is_fresh(uint32_t timeout_ms);
-
 
 /* 本工程固件为底盘板（chassis_board）：CAN1 收发 3508，CAN2 收发 6020。 */
 #define CHASSIS_3508_CAN hcan1  //2p
@@ -67,12 +54,29 @@ typedef enum
 	CAN1_3508_M4_ID = 0x204,
 	
 	CAN2_CHAS_6020_ID = 0x1FE,
+	CAN2_CHAS_6020_VOLTAGE_ID = 0x1FF,
 	CAN2_6020_M1_ID = 0x205,
 	CAN2_6020_M2_ID = 0x206,
 	CAN2_6020_M3_ID = 0x207,
 	CAN2_6020_M4_ID = 0x208,
 
 } CHAS_ID_e;
+
+/* Watch: 提交给 CAN2 的最近一次四路命令及 HAL 状态。HAL_OK 仅表示进入发送邮箱。 */
+typedef struct
+{
+	uint8_t rc_blocked;
+	uint8_t hal_status;
+	uint16_t std_id;
+	int16_t command[4];
+	uint32_t submit_ok_count;
+	uint32_t submit_error_count;
+	uint32_t can_error_code;
+	uint32_t can_esr;
+	uint32_t can_tsr;
+} CHAS_6020_TX_DEBUG_t;
+
+extern volatile CHAS_6020_TX_DEBUG_t chassis_6020_tx_debug;
 
 extern void CAN_cmd_CHAS_3508(int16_t motor1, int16_t motor2, int16_t motor3, int16_t motor4);
 extern void CAN_cmd_CHAS_6020(int16_t motor5, int16_t motor6, int16_t motor7, int16_t motor8);

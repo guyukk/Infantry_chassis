@@ -19,7 +19,6 @@
 #include "remote_control.h"
 #include "string.h"
 #include "video_transmission_module.h"
-#include "chassis_6020_bench_time.h"
 
 //遥控器出错数据上限
 #define RC_CHANNAL_ERROR_VALUE 700
@@ -34,8 +33,6 @@ extern VTM_Data_t vtm_data;
 
 //遥控器控制变量
 RC_ctrl_t rc_ctrl;
-static volatile uint32_t rc_last_valid_frame_ms;
-static volatile uint8_t rc_valid_frame_seen;
 
 //远程控制器类型: 0 - 遥控器		1 - 图传
 const uint8_t RC_TYPE = 0;
@@ -65,17 +62,6 @@ static int16_t RC_abs(int16_t value)
     {
         return -value;
     }
-}
-
-/* Validate a new DBUS frame without clearing rc_ctrl. RC_data_is_error has
- * that side effect and must remain in the chassis task's output gate. */
-static uint8_t RC_frame_is_valid(const RC_ctrl_t *control)
-{
-    return RC_abs(control->rc.ch[0]) <= RC_CHANNAL_ERROR_VALUE &&
-           RC_abs(control->rc.ch[1]) <= RC_CHANNAL_ERROR_VALUE &&
-           RC_abs(control->rc.ch[2]) <= RC_CHANNAL_ERROR_VALUE &&
-           RC_abs(control->rc.ch[3]) <= RC_CHANNAL_ERROR_VALUE &&
-           control->rc.s[0] != 0 && control->rc.s[1] != 0;
 }
 
 /**
@@ -145,17 +131,6 @@ error:
     return 1;
 }
 
-uint8_t RC_data_is_fresh(uint32_t timeout_ms)
-{
-    return bench_6020_time_fresh(HAL_GetTick(), rc_last_valid_frame_ms,
-        rc_valid_frame_seen, timeout_ms);
-}
-
-uint32_t RC_last_valid_frame_ms(void)
-{
-    return rc_last_valid_frame_ms;
-}
-
 void slove_RC_lost(void)
 {
     RC_restart(SBUS_RX_BUF_NUM);
@@ -199,15 +174,6 @@ void USART3_IRQHandler(void)
 								if(RC_TYPE == 0)
 								{
 									sbus_to_rc(sbus_rx_buf[0], &rc_ctrl);
-									if (RC_frame_is_valid(&rc_ctrl))
-									{
-										rc_last_valid_frame_ms = HAL_GetTick();
-										rc_valid_frame_seen = 1;
-									}
-									else
-									{
-										rc_valid_frame_seen = 0;
-									}
 								}
                 //记录数据接收时间
             }
@@ -235,15 +201,6 @@ void USART3_IRQHandler(void)
 								if(RC_TYPE == 0)
 								{
 									sbus_to_rc(sbus_rx_buf[1], &rc_ctrl);
-									if (RC_frame_is_valid(&rc_ctrl))
-									{
-										rc_last_valid_frame_ms = HAL_GetTick();
-										rc_valid_frame_seen = 1;
-									}
-									else
-									{
-										rc_valid_frame_seen = 0;
-									}
 								}
                 //记录数据接收时间
             }

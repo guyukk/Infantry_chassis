@@ -31,9 +31,6 @@
 #include "robot_param.h"
 #include "user_lib.h"
 #include <stdbool.h>
-#if CHASSIS_6020_BENCH_TEST
-#include "chassis_6020_bench_logic.h"
-#endif
 
 /********************************************
  * * * * * * * * * * * * * * * * * * * * * * 
@@ -137,13 +134,11 @@ static void chassis_init(chassis_move_t *chassis_move_init)
   * @param[out]     chassis_move_mode:"chassis_move"变量指针.
   * @retval         none
   */
-#if !CHASSIS_6020_BENCH_TEST
 static void chassis_set_mode(chassis_move_t *chassis_move_mode)
 {
 	if(chassis_move_mode == NULL) return;
 	chassis_behaviour_mode_set(chassis_move_mode);	//in file "chassis_behaviour.c"
 }
-#endif
 
 /**
   * @brief          底盘模式改变
@@ -221,7 +216,6 @@ void chassis_rc_to_control_vector(fp32 *vx_set, fp32 *vy_set, chassis_move_t *ch
 }
 
 //把小写的变量赋值成对应宏，用于调试，调试结束后应删除变量使用宏定义
-#if !CHASSIS_6020_BENCH_TEST
 fp32 chassis_follow_gimbal_yaw_offset = CHASSIS_FOLLOW_GIMBAL_YAW_OFFSET;
 fp32 chassis_spin_offset = CHASSIS_SPIN_OFFSET;
 
@@ -419,199 +413,6 @@ static void chassis_control_loop(chassis_move_t *chassis_move_control_loop)
 		chassis_move_control_loop->chassis_6020[i].give_current = (int16_t)chassis_move_control_loop->chas_6020_speed_pid[i].out;
 	}
 }
-#endif
-
-#if CHASSIS_6020_BENCH_TEST
-/* State 0: zero current, 1: short pulse, 2: closed-loop angle sweep. */
-volatile chassis_6020_bench_trace_t chassis_6020_bench_trace;
-
-static void chassis_6020_bench_clear_pid(void)
-{
-	for (uint8_t i = 0; i < 4; i++)
-	{
-		PID_clear(&chassis_move.chas_6020_angle_pid[i]);
-		PID_clear(&chassis_move.chas_6020_speed_pid[i]);
-		chassis_move.chassis_6020[i].give_current = 0;
-	}
-}
-
-static void chassis_6020_bench_record(uint32_t now, const RC_ctrl_t *rc)
-{
-	if (chassis_6020_bench_trace.frozen)
-	{
-		return;
-	}
-	volatile chassis_6020_bench_sample_t *sample =
-		&chassis_6020_bench_trace.sample[chassis_6020_bench_trace.next_index];
-	sample->time_ms = now;
-	sample->can_error = can_6020_tx_diag.last_error;
-	sample->rc_axis = rc->rc.ch[CHASSIS_6020_BENCH_AXIS];
-	sample->switch_left = rc->rc.s[0];
-	sample->switch_right = rc->rc.s[1];
-	sample->state = chassis_6020_bench_trace.state;
-	sample->tx_status = can_6020_tx_diag.last_status;
-	for (uint8_t i = 0; i < 4; i++)
-	{
-		const MOTOR_MEASURE_t *measure = chassis_move.chassis_6020[i].chassis_motor_measure;
-		uint32_t age = now - can_6020_last_feedback_ms[i];
-		sample->feedback_age_ms[i] = (uint16_t)(age > UINT16_MAX ? UINT16_MAX : age);
-		sample->motor[i].ecd = measure->ecd;
-		sample->motor[i].target_rad = chassis_move.chassis_6020[i].angle_set;
-		sample->motor[i].speed_rpm = measure->speed_rpm;
-		sample->motor[i].speed_target_rpm = chassis_move.chas_6020_angle_pid[i].out;
-		sample->motor[i].command_current = chassis_move.chassis_6020[i].give_current;
-		sample->motor[i].feedback_current = measure->given_current;
-	}
-	chassis_6020_bench_trace.samples_written++;
-	chassis_6020_bench_trace.next_index =
-		(chassis_6020_bench_trace.next_index + 1U) % CHASSIS_6020_BENCH_TRACE_COUNT;
-}
-
-static void chassis_6020_bench_task(void)
-{
-	const RC_ctrl_t *rc = get_remote_control_point();
-#if CHASSIS_6020_BENCH_MODE == 2
-	float initial_angle[4] = {0};
-	float sweep_offset = 0.0f;
-#else
-	uint32_t pulse_start_ms = 0;
-#endif
-#if CHASSIS_6020_BENCH_MODE == 2
-	uint32_t last_loop_ms = HAL_GetTick();
-#endif
-	uint32_t last_trace_ms = HAL_GetTick();
-	uint8_t release_seen = 0;
-	uint8_t active = 0;
-
-	chassis_6020_bench_clear_pid();
-	while (1)
-	{
-		uint32_t now = HAL_GetTick();
-#if CHASSIS_6020_BENCH_MODE == 2
-		uint32_t elapsed_ms = now - last_loop_ms;
-#endif
-		uint8_t rc_ok = RC_data_is_fresh(CHASSIS_6020_BENCH_RC_TIMEOUT_MS) && !RC_data_is_error();
-		uint8_t motors_ok = CAN_6020_feedback_is_fresh(CHASSIS_6020_BENCH_FEEDBACK_TIMEOUT_MS);
-		uint8_t switches_up = switch_is_up(rc->rc.s[0]) && switch_is_up(rc->rc.s[1]);
-		uint8_t was_active = active;
-		int16_t axis = rc->rc.ch[CHASSIS_6020_BENCH_AXIS];
-		int16_t current[4] = {0, 0, 0, 0};
-#if CHASSIS_6020_BENCH_MODE == 2
-		last_loop_ms = now;
-#endif
-
-		uint8_t healthy = bench_6020_healthy(rc_ok, motors_ok, switches_up,
-			can_6020_tx_diag.last_status == HAL_OK);
-		if (!healthy)
-		{
-			if (active)
-			{
-				chassis_6020_bench_trace.last_disarm_reason = !rc_ok ? 2U :
-					(!motors_ok ? 3U : (!switches_up ? 1U : 4U));
-			}
-			active = 0;
-			chassis_6020_bench_trace.state = 0;
-			chassis_6020_bench_clear_pid();
-			if (rc_ok && !switches_up)
-			{
-				release_seen = 1;
-			}
-			else if (!rc_ok || !motors_ok || can_6020_tx_diag.last_status != HAL_OK)
-			{
-				release_seen = 0;
-			}
-		}
-		else if (!active && bench_6020_can_arm(healthy, release_seen, axis,
-			CHASSIS_6020_BENCH_RC_DEADBAND))
-		{
-			active = 1;
-			release_seen = 0;
-			chassis_6020_bench_trace.frozen = 0;
-			chassis_6020_bench_trace.samples_written = 0;
-			chassis_6020_bench_trace.next_index = 0;
-			chassis_6020_bench_clear_pid();
-#if CHASSIS_6020_BENCH_MODE == 1
-			pulse_start_ms = now;
-#else
-			sweep_offset = 0.0f;
-			for (uint8_t i = 0; i < 4; i++)
-			{
-				initial_angle[i] = rad_format(
-					chassis_move.chassis_6020[i].chassis_motor_measure->ecd / GM6020_Angle_Ratio);
-				chassis_move.chassis_6020[i].angle_set = initial_angle[i];
-			}
-#endif
-		}
-
-		if (active)
-		{
-#if CHASSIS_6020_BENCH_MODE == 1
-			if ((uint32_t)(now - pulse_start_ms) < CHASSIS_6020_BENCH_PULSE_MS)
-			{
-				chassis_6020_bench_trace.state = 1;
-				for (uint8_t i = 0; i < 4; i++)
-				{
-					current[i] = CHASSIS_6020_BENCH_PULSE_CURRENT;
-				}
-			}
-			else
-			{
-				active = 0;
-				chassis_6020_bench_trace.state = 0;
-				chassis_6020_bench_trace.last_disarm_reason = 5U;
-				chassis_6020_bench_clear_pid();
-			}
-#else
-			chassis_6020_bench_trace.state = 2;
-			if (axis > -CHASSIS_6020_BENCH_RC_DEADBAND &&
-				axis < CHASSIS_6020_BENCH_RC_DEADBAND)
-			{
-				axis = 0;
-			}
-			if (axis > 660) axis = 660;
-			if (axis < -660) axis = -660;
-			if (elapsed_ms > 10U)
-			{
-				elapsed_ms = 10U;
-			}
-			sweep_offset = rad_format(sweep_offset +
-				((float)axis / 660.0f) * CHASSIS_6020_BENCH_SWEEP_RAD_PER_SEC *
-				((float)elapsed_ms / 1000.0f));
-			for (uint8_t i = 0; i < 4; i++)
-			{
-				float measured = rad_format(
-					chassis_move.chassis_6020[i].chassis_motor_measure->ecd / GM6020_Angle_Ratio);
-				float target = rad_format(initial_angle[i] + sweep_offset);
-				float adjusted_set = bench_6020_shortest_set(measured, target, PI);
-				chassis_move.chassis_6020[i].angle_set = target;
-				PID_calc(&chassis_move.chas_6020_angle_pid[i], measured, adjusted_set);
-				PID_calc(&chassis_move.chas_6020_speed_pid[i],
-					chassis_move.chassis_6020[i].chassis_motor_measure->speed_rpm,
-					chassis_move.chas_6020_angle_pid[i].out);
-				current[i] = bench_6020_limit_current(
-					chassis_move.chas_6020_speed_pid[i].out, CHASSIS_6020_BENCH_CURRENT_LIMIT);
-			}
-#endif
-		}
-		for (uint8_t i = 0; i < 4; i++)
-		{
-			chassis_move.chassis_6020[i].give_current = current[i];
-		}
-		CAN_cmd_CHAS_6020(current[0], current[1], current[2], current[3]);
-		if (was_active && !active)
-		{
-			chassis_6020_bench_record(now, rc);
-			chassis_6020_bench_trace.frozen = 1;
-		}
-		else if ((uint32_t)(now - last_trace_ms) >= CHASSIS_6020_BENCH_TRACE_INTERVAL_MS)
-		{
-			chassis_6020_bench_record(now, rc);
-			last_trace_ms = now;
-		}
-		osDelay(1);
-	}
-}
-#endif
 
 /**
   * @brief          底盘任务，间隔 CHASSIS_CONTROL_TIME_MS 2ms
@@ -622,9 +423,6 @@ void chassis_task(void const *pvParameters)
 {
 	vTaskDelay(CHASSIS_TASK_INIT_TIME);	//空闲一段时间
 	chassis_init(&chassis_move); //底盘初始化
-#if CHASSIS_6020_BENCH_TEST
-	chassis_6020_bench_task();
-#else
 	
 	/*
 	 * ========================================================================
@@ -648,18 +446,23 @@ void chassis_task(void const *pvParameters)
 		chassis_control_loop(&chassis_move);
 
 		// 1.1 遥控器数据非法时清空输出，避免用残留数据驱动底盘
-		if (RC_data_is_error())
+		chassis_6020_tx_debug.rc_blocked = RC_data_is_error();
+		if (chassis_6020_tx_debug.rc_blocked)
 		{
 			CAN_cmd_CHAS_6020(0, 0, 0, 0);
+			#if !CHASSIS_6020_ONLY_TEST
 			CAN_cmd_CHAS_3508(0, 0, 0, 0);
+			#endif
 		}
 		else
 		{
 			// 1.2 发送控制电流
 			CAN_cmd_CHAS_6020(chassis_move.chassis_6020[0].give_current, chassis_move.chassis_6020[1].give_current,
 												chassis_move.chassis_6020[2].give_current, chassis_move.chassis_6020[3].give_current);
+			#if !CHASSIS_6020_ONLY_TEST
 			CAN_cmd_CHAS_3508(chassis_move.chassis_3508[0].give_current,chassis_move.chassis_3508[1].give_current,
 												chassis_move.chassis_3508[2].give_current,chassis_move.chassis_3508[3].give_current);
+			#endif
 			
 		}
 		//系统延时
@@ -670,5 +473,4 @@ void chassis_task(void const *pvParameters)
 			chassis_high_water = uxTaskGetStackHighWaterMark(NULL);
 		#endif
 	}
-#endif
 }
