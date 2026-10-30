@@ -89,7 +89,7 @@
 //YAW回正模式PID
 
 //yaw 速度环 PID参数以及 PID最大输出，积分输出
-#define GM6020_MOTOR_SPEED_PID_KP        85.0f
+#define GM6020_MOTOR_SPEED_PID_KP        60.0f	//因检查颤抖原因，85->60. 2026/10/22
 #define GM6020_MOTOR_SPEED_PID_KI        0.0f
 #define GM6020_MOTOR_SPEED_PID_KD        80.0f
 #define GM6020_MOTOR_SPEED_PID_MAX_OUT   16000.0f
@@ -177,6 +177,44 @@ typedef struct
 	fp32 chassis_roll;  //陀螺仪和云台电机叠加的roll角度
 	
 } chassis_move_t;
+
+#if CHASSIS_6020_ONLY_TEST
+/* 单个 Watch 变量记录 0x205 的闭环状态，并以 0x206 的接收状态作总线对照。 */
+typedef struct
+{
+	uint32_t sample_tick_ms;
+	uint32_t sample_count;
+	uint32_t rx_count_205;
+	uint32_t rx_count_206;
+	uint32_t rx_age_205_ms;
+	uint32_t rx_age_206_ms;
+	uint16_t ecd_205;
+	int16_t feedback_rpm_205;
+	int16_t feedback_current_205;
+	fp32 target_angle_rad;
+	fp32 measured_angle_rad;
+	fp32 angle_pid_set_rad;
+	fp32 angle_pid_i;
+	fp32 angle_pid_out;
+	fp32 speed_pid_set_rpm;
+	fp32 speed_pid_fdb_rpm;
+	fp32 speed_pid_p;
+	fp32 speed_pid_d;
+	fp32 speed_pid_out;
+	int16_t command_205;
+	uint8_t chassis_mode;
+	uint8_t rc_blocked;
+	uint8_t tx_hal_status;
+	uint8_t rx_bus_205;
+	uint32_t tx_ok_count;
+	uint32_t tx_error_count;
+	uint32_t can_error_code;
+	uint32_t can_esr;
+	uint32_t can_tsr;
+} CHAS_6020_DIAG_t;
+
+extern volatile CHAS_6020_DIAG_t chassis_6020_diag;
+#endif
 
 
 extern void chassis_task(void const *pvParameters);

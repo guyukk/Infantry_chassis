@@ -24,6 +24,7 @@
 #include "main.h"
 #include "struct_typedef.h"
 #include "remote_control.h"
+#include "robot_param.h"
 
 
 /*电机数据结构体*/
@@ -40,7 +41,11 @@ typedef struct
 
 /* 本工程固件为底盘板（chassis_board）：CAN1 收发 3508，CAN2 收发 6020。 */
 #define CHASSIS_3508_CAN hcan1  //2p
-#define CHASSIS_6020_CAN hcan2  //4p
+#if CHASSIS_6020_ONLY_TEST
+#define CHASSIS_6020_CAN hcan1  // 仅台架：6020 接在已验证能接收反馈的 CAN1
+#else
+#define CHASSIS_6020_CAN hcan2  // 正常底盘：6020 使用 CAN2
+#endif
 
 
 /* CAN线发送与接收的ID */
@@ -54,7 +59,6 @@ typedef enum
 	CAN1_3508_M4_ID = 0x204,
 	
 	CAN2_CHAS_6020_ID = 0x1FE,
-	CAN2_CHAS_6020_VOLTAGE_ID = 0x1FF,
 	CAN2_6020_M1_ID = 0x205,
 	CAN2_6020_M2_ID = 0x206,
 	CAN2_6020_M3_ID = 0x207,
@@ -77,6 +81,17 @@ typedef struct
 } CHAS_6020_TX_DEBUG_t;
 
 extern volatile CHAS_6020_TX_DEBUG_t chassis_6020_tx_debug;
+
+/* Watch: 0x205-0x208 每路实际收到的反馈帧数和最近接收时刻。 */
+typedef struct
+{
+	uint32_t count[4];
+	uint32_t last_tick_ms[4];
+	uint8_t last_bus[4];  // 1: CAN1, 2: CAN2
+	uint32_t read_error_count;
+} CHAS_6020_RX_DEBUG_t;
+
+extern volatile CHAS_6020_RX_DEBUG_t chassis_6020_rx_debug;
 
 extern void CAN_cmd_CHAS_3508(int16_t motor1, int16_t motor2, int16_t motor3, int16_t motor4);
 extern void CAN_cmd_CHAS_6020(int16_t motor5, int16_t motor6, int16_t motor7, int16_t motor8);

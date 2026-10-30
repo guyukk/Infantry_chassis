@@ -23,7 +23,6 @@
 #include "cmsis_os.h"
 #include "bsp_rng.h"
 #include "bsp_usart.h"
-#include "robot_param.h"
 
 //电机数据读取
 #define get_motor_measure(ptr, data)                                \
@@ -45,6 +44,7 @@ static uint8_t chassis_can_send_data[8];
 //static MOTOR_MEASURE_t motor_chas[8];	//底盘上有8个电机
 MOTOR_MEASURE_t motor_chas[8];	//底盘上有8个电机
 volatile CHAS_6020_TX_DEBUG_t chassis_6020_tx_debug;
+volatile CHAS_6020_RX_DEBUG_t chassis_6020_rx_debug;
 	
 /**
   * @brief          HAL库CAN回调函数,接收底盘电机数据
@@ -56,7 +56,11 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 	CAN_RxHeaderTypeDef rx_header;
 	uint8_t rx_data[8];
 	
-	HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &rx_header, rx_data);
+	if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &rx_header, rx_data) != HAL_OK)
+	{
+		chassis_6020_rx_debug.read_error_count++;
+		return;
+	}
 	
 	switch (rx_header.StdId)
 	{
@@ -72,6 +76,13 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 			static uint8_t i = 0;
 			i = rx_header.StdId - CAN1_3508_M1_ID;
 			get_motor_measure(&motor_chas[i], rx_data);
+			if (i >= 4)
+			{
+				uint8_t motor_index = i - 4;
+				chassis_6020_rx_debug.count[motor_index]++;
+				chassis_6020_rx_debug.last_tick_ms[motor_index] = HAL_GetTick();
+				chassis_6020_rx_debug.last_bus[motor_index] = (hcan == &hcan1) ? 1 : 2;
+			}
 			break;
 		}
 		case 0x600:
@@ -130,11 +141,7 @@ void CAN_cmd_CHAS_6020(int16_t motor5, int16_t motor6, int16_t motor7, int16_t m
 {
 	uint32_t send_mail_box;
 	HAL_StatusTypeDef status;
-	#if CHASSIS_6020_ONLY_TEST && CHASSIS_6020_VOLTAGE_COMMAND_TEST
-	chassis_tx_message.StdId = CAN2_CHAS_6020_VOLTAGE_ID;
-	#else
 	chassis_tx_message.StdId = CAN2_CHAS_6020_ID;
-	#endif
 	chassis_tx_message.IDE = CAN_ID_STD;
 	chassis_tx_message.RTR = CAN_RTR_DATA;
 	chassis_tx_message.DLC = 0x08;

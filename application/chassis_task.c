@@ -44,6 +44,9 @@
 
 /* 底盘运动数据 */
 chassis_move_t chassis_move;
+#if CHASSIS_6020_ONLY_TEST
+volatile CHAS_6020_DIAG_t chassis_6020_diag;
+#endif
 
 /**
   * @brief          底盘测量数据更新，包括3508电机速度、6020电机角度、欧拉角度、机器人速度
@@ -414,6 +417,50 @@ static void chassis_control_loop(chassis_move_t *chassis_move_control_loop)
 	}
 }
 
+#if CHASSIS_6020_ONLY_TEST
+static void chassis_6020_diag_update(void)
+{
+	const pid_type_def *angle_pid = &chassis_move.chas_6020_angle_pid[0];
+	const pid_type_def *speed_pid = &chassis_move.chas_6020_speed_pid[0];
+	const MOTOR_MEASURE_t *motor = chassis_move.chassis_6020[0].chassis_motor_measure;
+	uint32_t rx_count_205 = chassis_6020_rx_debug.count[0];
+	uint32_t rx_count_206 = chassis_6020_rx_debug.count[1];
+	uint32_t rx_last_tick_205 = chassis_6020_rx_debug.last_tick_ms[0];
+	uint32_t rx_last_tick_206 = chassis_6020_rx_debug.last_tick_ms[1];
+	uint32_t now = HAL_GetTick();
+
+	chassis_6020_diag.sample_tick_ms = now;
+	chassis_6020_diag.rx_count_205 = rx_count_205;
+	chassis_6020_diag.rx_count_206 = rx_count_206;
+	chassis_6020_diag.rx_age_205_ms = rx_count_205 ? now - rx_last_tick_205 : UINT32_MAX;
+	chassis_6020_diag.rx_age_206_ms = rx_count_206 ? now - rx_last_tick_206 : UINT32_MAX;
+	chassis_6020_diag.rx_bus_205 = chassis_6020_rx_debug.last_bus[0];
+	chassis_6020_diag.ecd_205 = motor->ecd;
+	chassis_6020_diag.feedback_rpm_205 = motor->speed_rpm;
+	chassis_6020_diag.feedback_current_205 = motor->given_current;
+	chassis_6020_diag.target_angle_rad = chassis_move.chassis_6020[0].angle_set;
+	chassis_6020_diag.measured_angle_rad = chassis_move.chassis_6020[0].angle;
+	chassis_6020_diag.angle_pid_set_rad = angle_pid->set;
+	chassis_6020_diag.angle_pid_i = angle_pid->Iout;
+	chassis_6020_diag.angle_pid_out = angle_pid->out;
+	chassis_6020_diag.speed_pid_set_rpm = speed_pid->set;
+	chassis_6020_diag.speed_pid_fdb_rpm = speed_pid->fdb;
+	chassis_6020_diag.speed_pid_p = speed_pid->Pout;
+	chassis_6020_diag.speed_pid_d = speed_pid->Dout;
+	chassis_6020_diag.speed_pid_out = speed_pid->out;
+	chassis_6020_diag.command_205 = chassis_6020_tx_debug.command[0];
+	chassis_6020_diag.chassis_mode = (uint8_t)chassis_move.chassis_mode;
+	chassis_6020_diag.rc_blocked = chassis_6020_tx_debug.rc_blocked;
+	chassis_6020_diag.tx_hal_status = chassis_6020_tx_debug.hal_status;
+	chassis_6020_diag.tx_ok_count = chassis_6020_tx_debug.submit_ok_count;
+	chassis_6020_diag.tx_error_count = chassis_6020_tx_debug.submit_error_count;
+	chassis_6020_diag.can_error_code = chassis_6020_tx_debug.can_error_code;
+	chassis_6020_diag.can_esr = chassis_6020_tx_debug.can_esr;
+	chassis_6020_diag.can_tsr = chassis_6020_tx_debug.can_tsr;
+	chassis_6020_diag.sample_count++;
+}
+#endif
+
 /**
   * @brief          底盘任务，间隔 CHASSIS_CONTROL_TIME_MS 2ms
   * @param[in]      pvParameters: 空
@@ -465,6 +512,9 @@ void chassis_task(void const *pvParameters)
 			#endif
 			
 		}
+		#if CHASSIS_6020_ONLY_TEST
+		chassis_6020_diag_update();
+		#endif
 		//系统延时
 		//vTaskDelay(CHASSIS_CONTROL_TIME_MS);
 		osDelay(1);
