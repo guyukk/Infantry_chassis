@@ -87,7 +87,7 @@
 //YAW回正模式PID
 
 //yaw 速度环 PID参数以及 PID最大输出，积分输出
-#define GM6020_MOTOR_SPEED_PID_KP        85.0f
+#define GM6020_MOTOR_SPEED_PID_KP        65.0f
 #define GM6020_MOTOR_SPEED_PID_KI        0.0f
 #define GM6020_MOTOR_SPEED_PID_KD        80.0f
 #define GM6020_MOTOR_SPEED_PID_MAX_OUT   16000.0f

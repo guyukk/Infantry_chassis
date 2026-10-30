@@ -21,10 +21,10 @@
 #define HALF_WIDTH 0.149015f
 
 /* 四个舵向 6020 电机的初始角度，顺序对应 0 到 3 号电机。 */
-#define CHASSIS_6020_INIT_ANGLE_0 (-0.75f)
-#define CHASSIS_6020_INIT_ANGLE_1 (2.14f)
-#define CHASSIS_6020_INIT_ANGLE_2 (1.60f)
-#define CHASSIS_6020_INIT_ANGLE_3 (2.13f)
+#define CHASSIS_6020_INIT_ANGLE_0 (2.691592450f)
+#define CHASSIS_6020_INIT_ANGLE_1 (0.028407477f)
+#define CHASSIS_6020_INIT_ANGLE_2 (0.389999986f)
+#define CHASSIS_6020_INIT_ANGLE_3 (-2.73318529f)
 
 /* 云台 yaw 反馈方向与本底盘安装方向相反。 */
 #define GIMBAL_YAW_RADIAN_REVERSE 1
@@ -35,9 +35,9 @@
 
 /* 舵轮位置到电机索引的映射。 */
 #define WHEEL_RF 1
-#define WHEEL_LF 0
+#define WHEEL_LF 2
 #define WHEEL_LB 3
-#define WHEEL_RB 2
+#define WHEEL_RB 0
 
 /* 底盘跟随 yaw 灵敏度、小陀螺角速度及最大平移速度。 */
 #define CHASSIS_WZ_RC_SEN 0.004945f
